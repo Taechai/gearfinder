@@ -2,7 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+@layer components {
+  .bg-dark-gradient {
+    background: linear-gradient(
+      90deg,
+      rgba(7, 19, 48, 0) 0%,
+      #071330 50%,
+      rgba(7, 19, 48, 0) 100%
+    );
+  }
+}
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -30,4 +40,4 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-}
+} */
