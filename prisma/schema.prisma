@@ -1,0 +1,57 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Strores user information
+model User {
+    id                 Int       @id @default(autoincrement())
+    username           String    @unique
+    email              String    @unique
+    passwordHash       String
+    projectsOwned      Project[] @relation("OwnedProjects")
+    accessibleProjects Project[] @relation("SharedProjects")
+}
+
+// Manages project-related data
+model Project {
+    id          Int      @id @default(autoincrement())
+    projectName String   @unique
+    createdAt   DateTime @default(now())
+    owner       User     @relation("OwnedProjects", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ownerId     Int
+    sharedWith  User[]   @relation("SharedProjects")
+    files       File[]   @relation("FilesInProject")
+}
+
+// Tracks .xtf files and their metadata
+model File {
+    id                 Int                 @id @default(autoincrement())
+    filePath           String
+    uploadedAt         DateTime            @default(now())
+    project            Project             @relation("FilesInProject", fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    projectId          Int
+    ReconstructedImage ReconstructedImage? @relation("CorrespondingImage")
+}
+
+// Stores information about the reconstructed images
+model ReconstructedImage {
+    id              Int      @id @default(autoincrement())
+    imagePath       String
+    reconstructedAt DateTime @default(now())
+    file            File     @relation("CorrespondingImage", fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    fileId          Int      @unique
+}
+
+model Annotation {
+    id          Int      @id @default(autoincrement())
+    boundingBox Json
+    coordinate  Json
+    className   String
+    createdAt   DateTime @default(now())
+    status      String   @default("Not Found")
+}
