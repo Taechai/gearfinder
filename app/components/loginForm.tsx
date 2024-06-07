@@ -1,12 +1,34 @@
+'use client'
+
 import { EnvelopeIcon, KeyIcon, LinkIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import Input from "./inputText";
 import CheckBox from "./checkBox";
 import Button from "./button";
+import { FormEvent } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function loginForm() {
+  const router = useRouter()
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const response = await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirect: false
+    })
+
+    if (!response?.error) {
+      router.push("/gear-detection")
+      router.refresh()
+    }
+  }
+
   return (
-    <form className="flex flex-col items-stretch gap-[30px]" action="#">
+    <form onSubmit={handleSubmit} className="flex flex-col items-stretch gap-[30px]" action="#">
       <Input
         Icon={EnvelopeIcon}
         id="email"
@@ -36,7 +58,7 @@ export default function loginForm() {
       <p className="text-md font-extralight text-dark text-center">
         Don’t have an account yet?{" "}
         <Link
-          href="/create"
+          href="/signup"
           className="font-semibold hover:underline outline-none focus:underline"
         >
           Sign up

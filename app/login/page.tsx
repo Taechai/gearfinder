@@ -1,8 +1,14 @@
 import MerinovLogoDark from "@/public/merinov-logo-dark.png";
 import Image from "next/image";
 import LoginForm from "../components/loginForm";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function Login() {
+export default async function LoginPage() {
+  const session = await getServerSession()
+  if (session) {
+    redirect("/gear-detection")
+  }
   return (
     <div className="relative flex flex-col items-center justify-center gap-[30px] size-full p-[10px] ">
       <Image
