@@ -1,17 +1,21 @@
 import NavProfile from "./components/navProfile";
 import NavMain from "./components/navMain";
+import AuthSessionProvider from "@/app/lib/nextauth-provider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
   return (
     <>
       <div className="size-full grid grid-rows-[repeat(3,_min-content)_1fr_min-content] grid-cols-[300px_1fr] p-[10px] gap-[10px]">
         <NavProfile />
         <NavMain />
-        {children}
+        <AuthSessionProvider session={session}>{children}</AuthSessionProvider>
       </div>
     </>
   );
