@@ -2,7 +2,7 @@ import NavProfile from "./components/navProfile";
 import NavMain from "./components/navMain";
 import AuthSessionProvider from "@/app/lib/nextauth-provider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 
 export default async function RootLayout({
   children,

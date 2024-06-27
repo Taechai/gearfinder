@@ -11,6 +11,7 @@ declare module "next-auth" {
         id: string;
         email: string;
         fullName: string;
+        rememberMe: boolean
     }
 }
 
@@ -19,5 +20,7 @@ declare module "next-auth/jwt" {
         id: string;
         email: string;
         fullName: string;
+        rememberMe: boolean;
+        expires?: number;
     }
 }

@@ -16,6 +16,7 @@ export default function CheckBox({
     >
       <input
         id={id}
+        name={id}
         type="checkbox"
         className="appearance-none peer size-[20px] border border-solid border-dark rounded-[5px] checked:bg-dark transition-all ring-0 ring-dark/30 focus:ring-[1px] outline-none"
         defaultChecked={defaultChecked}
