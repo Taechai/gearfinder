@@ -4,9 +4,9 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
-
+  console.log(request.url)
   if (!token) {
-    console.log("No token found")
+    console.log("\nNo token found\n")
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
@@ -19,10 +19,24 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.redirect(new URL('/login', request.url))
       response.cookies.set('next-auth.session-token', '', { maxAge: 0 });
       response.cookies.set('next-auth.csrf-token', '', { maxAge: 0 });
-      console.log("Token expired")
+      console.log("\nToken expired\n")
       return response
     }
   }
+
+  // Redirecting to /create when it's the user's first connection
+  if (!request.nextUrl.pathname.includes("/create")) {
+    const userId = token.id
+    const apiUrl = new URL(`api/check-first-connection?userId=${userId}`, request.nextUrl.origin)
+    const response = await (await fetch(apiUrl, { method: "GET" })).json();
+
+    if (!response.error) {
+      if (response.firstConnection) {
+        return NextResponse.redirect(new URL('/create', request.nextUrl.origin))
+      }
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -34,5 +48,6 @@ export const config = {
     '/gear-detection/:path*',
     '/ml-setup/:path*',
     '/gear-map/:path*',
-    '/create/:path*'],
+    '/create/:path*',
+  ],
 };

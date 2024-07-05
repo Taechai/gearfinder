@@ -16,6 +16,9 @@
 # production
 /build
 
+# Uploaded Files
+/app/api/upload/uploaded-files
+
 # misc
 .DS_Store
 *.pem

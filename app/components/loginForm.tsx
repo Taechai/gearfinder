@@ -8,6 +8,7 @@ import Button from "./button";
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { validateEmail } from "@/app/lib/formValidation";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -16,11 +17,6 @@ export default function LoginForm() {
     password: "",
     form: "",
   });
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,6 +46,7 @@ export default function LoginForm() {
       redirect: false,
       // callbackUrl: "/gear-map",
     });
+
     if (!response?.error) {
       router.push("/gear-detection");
       router.refresh();

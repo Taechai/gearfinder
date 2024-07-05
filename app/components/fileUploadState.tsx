@@ -1,23 +1,32 @@
 import {
   DocumentTextIcon,
-  TrashIcon,
   ExclamationCircleIcon,
   DocumentArrowUpIcon,
+  XCircleIcon,
 } from "@heroicons/react/20/solid";
 export default function FileUploadState({
   status,
   fileName,
   twWidth,
+  onDelete,
 }: {
   status: string;
   fileName: string;
   twWidth?: string;
+  onDelete: () => void;
 }) {
   let textColor, bgColor, borderColor, animate;
   let Icon: React.ComponentType<{
     className?: string;
   }>;
   switch (status) {
+    case "local":
+      textColor = "text-primary-dark";
+      bgColor = "bg-primary-light/20";
+      borderColor = "border-primary-dark/50";
+      Icon = DocumentTextIcon;
+      break;
+
     case "uploading":
       textColor = "text-warning-dark";
       bgColor = "bg-warning-light/20";
@@ -58,7 +67,10 @@ export default function FileUploadState({
       >
         {fileName}
       </p>
-      <TrashIcon className="size-[23px] text-error-dark hover:scale-110 cursor-pointer transition-all" />
+      <XCircleIcon
+        onClick={onDelete}
+        className={`size-[23px] text-error-dark hover:scale-110 cursor-pointer transition-all`}
+      />
     </div>
   );
 }

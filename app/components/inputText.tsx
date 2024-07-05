@@ -13,6 +13,7 @@ export default function InputText({
   twText = "text-md",
   removeIconBg = false,
   iconSize = "size-[20px]",
+  disabled = false,
 }: {
   Icon: React.ComponentType<{
     className?: string;
@@ -28,6 +29,7 @@ export default function InputText({
   twText?: string;
   removeIconBg?: boolean;
   iconSize?: string;
+  disabled?: boolean;
 }) {
   return (
     <div
@@ -37,11 +39,12 @@ export default function InputText({
         type={type}
         name={name}
         id={id}
-        className={`w-full pointer-events-auto peer bg-transparent ${twText} text-dark font-light placeholder:text-dark/35 outline-none`}
+        className={`w-full pointer-events-auto peer bg-transparent ${twText} text-dark font-light placeholder:text-dark/35 outline-none disabled:text-dark/70`}
         placeholder={placeholder}
         required={required}
         value={value}
         onChange={onChange}
+        disabled={disabled}
       />
       {removeIconBg ? (
         <Icon

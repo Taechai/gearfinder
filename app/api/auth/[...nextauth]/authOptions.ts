@@ -38,7 +38,6 @@ export const authOptions: NextAuthOptions = {
                 if (!passwordHash || !passwordToCheck) return null
 
                 const isPasswordCorrect = await compare(passwordToCheck, passwordHash);
-                console.log("Remember Me:", credentials.rememberMe)
                 if (isPasswordCorrect) {
                     return {
                         id: user.id.toString(),

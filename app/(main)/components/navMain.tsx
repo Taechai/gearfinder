@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import Button from "@/app/components/button";
-import { ShareIcon } from "@heroicons/react/20/solid";
+import { ShareIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
 interface navState {
   [key: string]: { isChecked: boolean; label: string }; // Index signature
 
@@ -70,14 +70,24 @@ export default function NavMain() {
           />
         ))}
       </div>
-      <Button
-        Icon={ShareIcon}
-        otherTwClass={"bg-secondary-light/50 !text-secondary-dark !font-bold"}
-        twHover="hover:bg-secondary-light/75"
-        twFocus="focus:ring-[3px] focus:ring-secondary-dark/50"
-      >
-        Share
-      </Button>
+      <div className="flex gap-[10px]">
+        <Button
+          Icon={FolderPlusIcon}
+          otherTwClass={"bg-primary-light !text-primary-dark !font-bold"}
+          twHover="hover:bg-primary-main/30"
+          twFocus="focus:ring-[3px] focus:ring-primary-dark/50"
+        >
+          Add New Project
+        </Button>
+        <Button
+          Icon={ShareIcon}
+          otherTwClass={"bg-secondary-light/50 !text-secondary-dark !font-bold"}
+          twHover="hover:bg-secondary-light/75"
+          twFocus="focus:ring-[3px] focus:ring-secondary-dark/50"
+        >
+          Share
+        </Button>
+      </div>
     </div>
   );
 }

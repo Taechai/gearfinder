@@ -52,6 +52,9 @@ const config: Config = {
       },
       screens: {
         "max-sm": { max: "639px" },
+        'h-sm': { 'raw': '(min-height: 600px)' },
+        'h-md': { 'raw': '(min-height: 900px)' },
+        'h-lg': { 'raw': '(min-height: 1000px)' },
       },
     },
   },

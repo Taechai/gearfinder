@@ -54,12 +54,10 @@ export default function Page() {
             />
           </div>
         </div>
-        {/* <div className="bg-light/50 rounded-[10px] overflow-hidden"> */}
+
         <RecoilRoot>
           <ImageAnnotator />
         </RecoilRoot>
-        {/* <ImageAnnotation /> */}
-        {/* </div> */}
       </FileContext.Provider>
     </>
   );

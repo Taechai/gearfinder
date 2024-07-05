@@ -1,12 +1,34 @@
+"use client";
 import { CloudArrowUpIcon } from "@heroicons/react/20/solid";
+import _ from "lodash";
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
 
 export default function InputDragFile({
+  setFiles,
   twWidth,
   twHeight,
 }: {
+  setFiles: Dispatch<SetStateAction<{ file: File; state: string }[]>>;
   twWidth?: string;
   twHeight?: string;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    let files: { file: File; state: string }[] = [];
+    if (fileList) {
+      for (let i of _.range(0, fileList.length)) {
+        files.push({ file: fileList[i], state: "local" });
+      }
+      // console.log(files[0].file.name);
+      setFiles((prev) => [...prev, ...files]);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    }
+  };
+
   return (
     <label
       htmlFor="dropzone-file"
@@ -24,9 +46,12 @@ export default function InputDragFile({
       </div>
       <input
         id="dropzone-file"
+        ref={inputRef}
         type="file"
         className="opacity-0 size-full absolute cursor-pointer"
-        accept=".xtf"
+        accept=".pdf"
+        multiple
+        onChange={handleFileChange}
         required
       />
     </label>
