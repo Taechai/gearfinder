@@ -28,6 +28,7 @@ export default function ProjectsList({
           const selectedProject = projectsList.find(
             (project) => project.name === currentProjectValue
           );
+          console.log("Selected project:", selectedProject);
           if (selectedProject) {
             setCurrentProject(selectedProject);
           } else {
@@ -39,7 +40,7 @@ export default function ProjectsList({
 
   useEffect(() => {
     if (currentProject.name !== "" && currentProject.name !== undefined) {
-      fetch("api/projects/set-current-project", {
+      fetch("/api/projects/set-current-project", {
         method: "POST",
         body: JSON.stringify({ currentProject }),
       });
