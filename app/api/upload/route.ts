@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
                     }
                 }
             }
-        }).catch(async (error) => {
+        }).catch(async (error: { code: string; }) => {
             if (error.code == 'P2002') {
                 const projectInfo = await prisma.project.findFirst({
                     where: {
@@ -77,9 +77,9 @@ export async function POST(request: NextRequest) {
 
         console.log("\nCreated Successfully\n")
     } catch (error) {
-        console.log("ERROR:")
+        console.log("An Error Occured:")
         console.log(file.name)
-        return NextResponse.json({ message: "Unique key constraint failed" }, { status: 400 });
+        return NextResponse.json({ message: "An error occured" }, { status: 400 });
     }
 
 
@@ -87,3 +87,9 @@ export async function POST(request: NextRequest) {
 }
 
 // Do not forget to limit the size of the uploaded files
+// Checking the user's first connection should be done once a time, and then update the token in the middleware
+// The middleware should be run on all the requests, I have a problem when I do that, the css seem to be deactivated
+// If a made a the current project to be stored in the localStorage, then we have to check everytime in the server that the current project is always in the database
+// If a user changes the selected file, there should be loading of the new annotations for the selected file
+
+// Need to fix the error I have in: ./app/(main)/ml-setup/[fileId]/page.tsx [FIXED]

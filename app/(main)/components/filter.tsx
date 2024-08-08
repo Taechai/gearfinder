@@ -2,7 +2,7 @@ import { ChangeEventHandler } from "react";
 
 const filters = [
   { label: "All", color: "primary" },
-  { label: "Unassined", color: "error" },
+  { label: "Unassigned", color: "error" },
   { label: "Annotated", color: "success" },
 ];
 
@@ -34,9 +34,11 @@ const colorClasses: colorClasses = {
 
 export default function Filter({
   name,
+  defaultCheckedValue,
   onChange,
 }: {
   name: string;
+  defaultCheckedValue: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
@@ -49,7 +51,7 @@ export default function Filter({
             name={name}
             className="absolute z-[-1] size-full appearance-none outline-none peer/radio"
             onChange={onChange}
-            defaultChecked={label == "Unassined"}
+            defaultChecked={label.toLowerCase() == defaultCheckedValue}
           />
           <p
             className={`w-fit pointer-events-auto peer bg-transparent text-sm transition-all duration-300 p-[5px] rounded-[5px] ${colorClasses[color].text} ${colorClasses[color].textChecked} font-normal peer-checked/radio:font-bold ${colorClasses[color].bgChecked}`}

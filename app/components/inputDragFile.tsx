@@ -5,12 +5,14 @@ import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
 
 export default function InputDragFile({
   setFiles,
+  accept = ".xtf",
   twWidth,
   twHeight,
 }: {
   setFiles: Dispatch<SetStateAction<{ file: File; state: string }[]>>;
   twWidth?: string;
   twHeight?: string;
+  accept?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -49,7 +51,7 @@ export default function InputDragFile({
         ref={inputRef}
         type="file"
         className="opacity-0 size-full absolute cursor-pointer"
-        accept=".pdf"
+        accept={accept}
         multiple
         onChange={handleFileChange}
         required

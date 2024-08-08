@@ -1,6 +1,5 @@
 import { DocumentTextIcon, CheckCircleIcon } from "@heroicons/react/20/solid";
-import { ChangeEventHandler, useContext } from "react";
-import FileContext from "../gear-detection/contexts/fileContext";
+import { ChangeEventHandler } from "react";
 export default function FileSelectInput({
   fileId,
   label,
@@ -14,8 +13,6 @@ export default function FileSelectInput({
   selectedFileId: string;
   onChange: ChangeEventHandler;
 }) {
-  const { selectedFile, setSelectedFile } = useContext(FileContext);
-
   return (
     <label
       key={fileId}

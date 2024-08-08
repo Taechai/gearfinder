@@ -3,34 +3,62 @@ import FileSelectInput from "../components/fileSelectInput";
 import SearchBar from "../components/searchBar";
 import { ArrowUpTrayIcon } from "@heroicons/react/20/solid";
 import Filter from "../components/filter";
-import { ChangeEvent, useContext, useEffect, useState } from "react";
-import FileContext from "./contexts/fileContext";
+import { ChangeEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRecoilValue } from "recoil";
+import { currentProjectAtom } from "../projectAtom";
 
 const files = [
-  { fileId: "1", fileName: "File 1", state: "annotated" },
-  { fileId: "2", fileName: "File 2", state: "annotated" },
-  { fileId: "3", fileName: "File 3", state: "unassined" },
-  { fileId: "4", fileName: "File 4", state: "annotated" },
-  { fileId: "5", fileName: "File 5", state: "annotated" },
-  { fileId: "6", fileName: "File 6", state: "annotated" },
-  { fileId: "7", fileName: "File 7", state: "annotated" },
-  { fileId: "8", fileName: "File 8", state: "unassined" },
-  { fileId: "9", fileName: "File 9", state: "unassined" },
-  { fileId: "10", fileName: "File 10", state: "unassined" },
+  {
+    fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
+    fileName: "File 1",
+    state: "annotated",
+  },
+  {
+    fileId: "14efabce-1f81-4b8b-9246-3b771e0d3999",
+    fileName: "File 2",
+    state: "annotated",
+  },
+  {
+    fileId: "20e20776-c959-4c9b-87be-1038a3327453",
+    fileName: "File 3",
+    state: "unassigned",
+  },
+  {
+    fileId: "1461401f-46bb-4731-b7d7-0c8621937790",
+    fileName: "File 4",
+    state: "annotated",
+  },
+  {
+    fileId: "ae759aaa-06fa-4b00-b0a3-c29fa9775163",
+    fileName: "File 5",
+    state: "unassigned",
+  },
+  {
+    fileId: "be4e7bf4-77ec-41df-8de5-ad39f2461540",
+    fileName: "File 6",
+    state: "unassigned",
+  },
 ];
 
 export default function SidescanFileBrowser() {
   const [filteredFiles, setFilteredFiles] = useState<
     { fileId: string; fileName: string; state: string }[]
   >([]);
-  const [filterBy, setFilterBy] = useState(["unassined"]);
+  const selectedFileId = useSearchParams().get("id") || "";
+
+  const [filterBy, setFilterBy] = useState<string[]>(() => {
+    const selectedFile = files.find(({ fileId }) => fileId === selectedFileId);
+    return [selectedFile ? selectedFile.state : "unassigned"];
+  });
   const [searchQuery, setSearchQuery] = useState("");
-  const { selectedFile, setSelectedFile } = useContext(FileContext);
+
+  const router = useRouter();
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let filterBy = [e.currentTarget.id.toLowerCase()];
     if (filterBy.includes("all")) {
-      filterBy = ["unassined", "annotated"];
+      filterBy = ["unassigned", "annotated"];
     }
     setFilterBy(filterBy);
     setFilteredFiles(
@@ -56,10 +84,9 @@ export default function SidescanFileBrowser() {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedFile({
-      fileId: e.currentTarget.id,
-      fileName: e.currentTarget.value,
-    });
+    router.push(
+      `/gear-detection?id=${e.currentTarget.id}&fileName=${e.currentTarget.value}`
+    );
   };
 
   useEffect(() => {
@@ -78,7 +105,11 @@ export default function SidescanFileBrowser() {
         </button>
       </div>
 
-      <Filter name="filters" onChange={handleFilterChange} />
+      <Filter
+        name="filters"
+        onChange={handleFilterChange}
+        defaultCheckedValue={filterBy[0]}
+      />
       {filteredFiles.length != 0 ? (
         <div className="flex flex-col gap-[5px] overflow-auto">
           {filteredFiles.map(({ fileId, fileName }) => (
@@ -87,7 +118,7 @@ export default function SidescanFileBrowser() {
               fileId={fileId}
               label={fileName}
               name="file-selection"
-              selectedFileId={selectedFile.fileId}
+              selectedFileId={selectedFileId}
               onChange={handleFileChange}
             />
           ))}

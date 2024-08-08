@@ -30,6 +30,7 @@ import ImageDisplay from "./imageDisplay";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { throttle } from "lodash";
 import React from "react";
+import { useSearchParams } from "next/navigation";
 
 interface Annotation {
   id: number;
@@ -416,6 +417,13 @@ export default React.memo(function AnnotationLayer({
       nextId.current = JSON.parse(savedAnnotations).length;
     }
   }, []);
+
+  // If a user changes the selected file, there should be loading of the new annotations for the selected file
+  const id = useSearchParams().get("id");
+  useEffect(() => {
+    resetZoomLevel();
+    setAnnotations([]);
+  }, [id]);
 
   return (
     <div className="relative size-full bg-light/50 rounded-[10px] p-[10px] ">

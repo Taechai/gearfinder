@@ -1,18 +1,14 @@
 "use client";
-import { Fragment, useState } from "react";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 
-const people = [
-  { name: "Summer Trip 2020" },
-  { name: "Summer Trip 2021" },
-  { name: "Autumn Trip 2021" },
-  { name: "Summer Trip 2022" },
-  { name: "Autumn Trip 2023" },
-  { name: "Random Trip On 10/06/2023" },
-];
+// const items = [{ name: "Project XXXX" }, { name: "Project 2" }];
 
 export default function ListBox({
+  items,
+  selected,
+  setSelected,
   btnBgColor = "bg-light-dark/20",
   btnTextColor = "text-white",
   listOptionsBgColor = "bg-white/30",
@@ -20,6 +16,13 @@ export default function ListBox({
   selectedBgColor = "bg-light-dark/50",
   selectedTextColor = "text-dark",
 }: {
+  items: { name: string }[];
+  selected: { name: string };
+  setSelected: Dispatch<
+    SetStateAction<{
+      name: string;
+    }>
+  >;
   btnBgColor?: string;
   btnTextColor?: string;
   listOptionsBgColor?: string;
@@ -27,7 +30,7 @@ export default function ListBox({
   selectedBgColor?: string;
   selectedTextColor?: string;
 }) {
-  const [selected, setSelected] = useState(people[0]);
+  // const [selected, setSelected] = useState(items[0]);
 
   return (
     <div className="w-fit max-w-[200px]">
@@ -54,15 +57,15 @@ export default function ListBox({
             <Listbox.Options
               className={`z-10 absolute mt-[7px] max-h-[145px] w-full overflow-auto rounded-[10px] ${listOptionsBgColor} backdrop-blur-sm p-[5px] text-base shadow-lg ring-1 ring-black/5 focus:outline-none text-md`}
             >
-              {people.map((person, personIdx) => (
+              {items.map((item, itemIdx) => (
                 <Listbox.Option
-                  key={personIdx}
+                  key={itemIdx}
                   className={({ active }) =>
                     `relative cursor-pointer select-none p-[5px] flex items-center gap-[10px] rounded-[10px] transition-all ${
                       active ? selectedBgColor : null
                     }`
                   }
-                  value={person}
+                  value={item}
                 >
                   {({ selected }) => (
                     <>
@@ -83,7 +86,7 @@ export default function ListBox({
                             : `font-normal ${listOptionTextColor}`
                         }`}
                       >
-                        {person.name}
+                        {item.name}
                       </span>
                     </>
                   )}

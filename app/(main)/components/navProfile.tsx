@@ -1,11 +1,15 @@
-"use client";
+// "use client";
 import { BellIcon } from "@heroicons/react/20/solid";
 import MerinovLogoWhite from "@/public/merinov-logo-white.png";
 import Image from "next/image";
-import ListBox from "@/app/components/listBox";
-import { signOut } from "next-auth/react";
+// import ListBox from "@/app/components/listBox";
+// import { signOut } from "next-auth/react";
+// import { RecoilRoot } from "recoil";
+import ProjectsList from "./projectsList";
+import { cookies } from "next/headers";
 
 export default function NavProfile() {
+  const currentProject = getCurrentProject();
   return (
     <nav className="bg-dark col-span-2 rounded-[10px] flex gap-[10px] p-[10px] items-center">
       <div className="w-[55px] min-w-[30px] aspect-square relative">
@@ -17,13 +21,13 @@ export default function NavProfile() {
         />
       </div>
       <div className="w-full">
-        <ListBox />
+        <ProjectsList currentProjectValue={currentProject} />
       </div>
       <BellIcon className={"size-[20px] min-w-[20px] text-white"} />
       <div
-        onClick={() => {
-          signOut();
-        }}
+        // onClick={() => {
+        //   signOut();
+        // }}
         className="h-full cursor-pointer aspect-square bg-light-dark/50 rounded-full flex justify-center items-center font-bold text-white"
       >
         OA
@@ -31,3 +35,9 @@ export default function NavProfile() {
     </nav>
   );
 }
+
+const getCurrentProject = () => {
+  const cookieStore = cookies();
+  const currentProject = cookieStore.get("currentProject");
+  return currentProject?.value;
+};

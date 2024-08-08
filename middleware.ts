@@ -25,14 +25,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirecting to /create when it's the user's first connection
-  if (!request.nextUrl.pathname.includes("/create")) {
+  if (!request.nextUrl.pathname.includes("/create-new")) {
     const userId = token.id
     const apiUrl = new URL(`api/check-first-connection?userId=${userId}`, request.nextUrl.origin)
     const response = await (await fetch(apiUrl, { method: "GET" })).json();
 
     if (!response.error) {
       if (response.firstConnection) {
-        return NextResponse.redirect(new URL('/create', request.nextUrl.origin))
+        return NextResponse.redirect(new URL('/create-new', request.nextUrl.origin))
       }
     }
   }
@@ -48,6 +48,7 @@ export const config = {
     '/gear-detection/:path*',
     '/ml-setup/:path*',
     '/gear-map/:path*',
-    '/create/:path*',
+    '/create-new/:path*',
+    '/create-project/:path*',
   ],
 };

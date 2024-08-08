@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import Button from "@/app/components/button";
 import { ShareIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 interface navState {
   [key: string]: { isChecked: boolean; label: string }; // Index signature
 
@@ -25,7 +26,7 @@ export default function NavMain() {
     setNavState({
       "gear-detection": {
         ...navState["gear-detection"],
-        isChecked: pathname === "/gear-detection",
+        isChecked: pathname.includes("/gear-detection"),
       },
       "ml-setup/unassigned": {
         ...navState["ml-setup/unassigned"],
@@ -71,11 +72,15 @@ export default function NavMain() {
         ))}
       </div>
       <div className="flex gap-[10px]">
+        {/* <Link href="/create">ADD</Link> */}
         <Button
           Icon={FolderPlusIcon}
           otherTwClass={"bg-primary-light !text-primary-dark !font-bold"}
           twHover="hover:bg-primary-main/30"
           twFocus="focus:ring-[3px] focus:ring-primary-dark/50"
+          onClick={() => {
+            router.push("/create-project");
+          }}
         >
           Add New Project
         </Button>
