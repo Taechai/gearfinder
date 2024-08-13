@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
     const response = await (await fetch(apiUrl, { method: "GET" })).json();
 
     if (!response.error) {
-      if (response.firstConnection) {
+      if (!response.hasProjects) {
         return NextResponse.redirect(new URL('/create-new', request.nextUrl.origin))
       }
     }

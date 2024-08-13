@@ -421,7 +421,6 @@ export default React.memo(function AnnotationLayer({
   // If a user changes the selected file, there should be loading of the new annotations for the selected file
   const id = useSearchParams().get("id");
   useEffect(() => {
-    resetZoomLevel();
     setAnnotations([]);
   }, [id]);
 

@@ -15,11 +15,34 @@ import {
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { totalOffsetSelector } from "./atoms/annotationSelectors";
 import React from "react";
+import { useSearchParams } from "next/navigation";
 
-const img1 =
-  "https://images.unsplash.com/photo-1503891450247-ee5f8ec46dc3?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-const img2 =
-  "https://images.unsplash.com/photo-1533282960533-51328aa49826?q=80&w=3042&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const files = [
+  {
+    fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
+    filePath: "/reconstructed/5ea2a3f8-e159-4beb-8a69-83de45749c8e.png",
+  },
+  {
+    fileId: "14efabce-1f81-4b8b-9246-3b771e0d3999",
+    filePath: "/reconstructed/14efabce-1f81-4b8b-9246-3b771e0d3999.png",
+  },
+  {
+    fileId: "20e20776-c959-4c9b-87be-1038a3327453",
+    filePath: "/reconstructed/20e20776-c959-4c9b-87be-1038a3327453.png",
+  },
+  {
+    fileId: "1461401f-46bb-4731-b7d7-0c8621937790",
+    filePath: "/reconstructed/1461401f-46bb-4731-b7d7-0c8621937790.png",
+  },
+  {
+    fileId: "ae759aaa-06fa-4b00-b0a3-c29fa9775163",
+    filePath: "/reconstructed/ae759aaa-06fa-4b00-b0a3-c29fa9775163.png",
+  },
+  {
+    fileId: "be4e7bf4-77ec-41df-8de5-ad39f2461540",
+    filePath: "/reconstructed/be4e7bf4-77ec-41df-8de5-ad39f2461540.png",
+  },
+];
 
 export default React.memo(function ImageDisplay({
   imageRef,
@@ -51,17 +74,22 @@ export default React.memo(function ImageDisplay({
     setIsImgLoaded(true);
   }, []);
 
+  const id = useSearchParams().get("id");
+
+  // Set the image src whenever the user changes the file
+  useEffect(() => {
+    const selectedFile = files.find(({ fileId }) => fileId == id);
+    if (selectedFile?.filePath) {
+      setSrc(selectedFile.filePath);
+    } else setSrc("");
+  }, [id]);
+
   // Set the initialZoomLevel and Image Size when the image is loaded
   useEffect(() => {
     const { imgW, imgH, newZoomLevel } = resetZoomLevel();
     setInitialZoomLevel(newZoomLevel);
     setImageSize({ width: `${imgW}px`, height: `${imgH}px` });
-  }, [src]);
-
-  // Set the image src when the component is mounted
-  useEffect(() => {
-    setSrc(img1);
-  }, []);
+  }, [isImgLoaded]);
 
   // Center the loaded image in the view
   useEffect(() => {
@@ -86,12 +114,13 @@ export default React.memo(function ImageDisplay({
       });
       setIsImgLoaded(false);
     }
-  }, [isImgLoaded]);
+  }, [imageSize]);
 
   return (
     <img
       ref={imageRef}
-      src={SonarImage.src}
+      src={src}
+      // src={SonarImage.src}
       alt="Image to annotate"
       onLoad={handleImageLoad}
       style={{

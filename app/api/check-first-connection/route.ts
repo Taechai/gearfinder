@@ -16,12 +16,11 @@ export async function GET(request: NextRequest) {
             },
         },
     });
-
     const projectsCount = user?._count.projectsOwned
 
     if (!user) {
         return NextResponse.json({ error: "User not found." }, { status: 404 })
     }
 
-    return NextResponse.json({ message: "Success", firstConnection: projectsCount == 0 })
+    return NextResponse.json({ message: "Success", hasProjects: projectsCount != 0 })
 }

@@ -28,7 +28,6 @@ export default function ProjectsList({
           const selectedProject = projectsList.find(
             (project) => project.name === currentProjectValue
           );
-          console.log("Selected project:", selectedProject);
           if (selectedProject) {
             setCurrentProject(selectedProject);
           } else {
