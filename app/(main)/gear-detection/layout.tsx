@@ -10,7 +10,7 @@ export default async function RootLayout({
   return (
     <>
       <div className=" row-span-3 pl-[10px] flex flex-col gap-[10px]">
-        <div className="relative flex flex-col gap-[5px] min-h-[250px] max-h-full overflow-auto">
+        <div className="relative flex flex-col gap-[5px] min-h-[150px] max-h-full overflow-auto">
           <SidescanFileBrowser />
         </div>
 

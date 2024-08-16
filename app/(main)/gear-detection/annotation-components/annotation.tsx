@@ -12,7 +12,7 @@ import { totalOffsetSelector } from "./atoms/annotationSelectors";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
 interface Annotation {
-  id: number;
+  id: string;
   x: number;
   y: number;
   width: number;

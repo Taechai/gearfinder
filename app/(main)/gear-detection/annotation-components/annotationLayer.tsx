@@ -1,6 +1,6 @@
 // Done: When I drage a box and the cursor is out of the container it should unfocus
 // When drawing a box, we should be able to resize and pan it
-
+import { v4 as uuidv4 } from "uuid";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   annotationAtom,
@@ -21,7 +21,6 @@ import {
   zoomOffsetAtom,
 } from "./atoms/annotationAtoms";
 import {
-  totalOffsetSelector,
   displayedAnnotationsSelector,
   drawnAnnotationSelector,
 } from "./atoms/annotationSelectors";
@@ -30,15 +29,14 @@ import ImageDisplay from "./imageDisplay";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { throttle } from "lodash";
 import React from "react";
-import { useSearchParams } from "next/navigation";
 
-interface Annotation {
-  id: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+// interface Annotation {
+//   id: number | String;
+//   x: number;
+//   y: number;
+//   width: number;
+//   height: number;
+// }
 
 export default React.memo(function AnnotationLayer({
   imageRef,
@@ -72,7 +70,7 @@ export default React.memo(function AnnotationLayer({
 
   // const [isImgLoaded, setIsImgLoaded] = useRecoilState(isImgLoadedAtom);
 
-  const [annotations, setAnnotations] = useRecoilState(annotationsAtom);
+  const setAnnotations = useSetRecoilState(annotationsAtom);
   const [annotation, setAnnotation] = useRecoilState(annotationAtom);
   const [startPoint, setStartPoint] = useRecoilState(startPointAtom);
 
@@ -92,7 +90,9 @@ export default React.memo(function AnnotationLayer({
   // References
   // const imageRef = useRef<HTMLImageElement>(null);
   // const containerRef = useRef<HTMLDivElement>(null);
-  const nextId = useRef(0);
+
+  // const nextId = useRef(0);
+  const [currentId, setCurrentId] = useState(uuidv4());
 
   const calculateRelativePosition = useCallback(
     (e: React.MouseEvent, refObj: RefObject<HTMLElement>) => {
@@ -120,8 +120,11 @@ export default React.memo(function AnnotationLayer({
 
         setStartPoint({ x, y });
         setIsDrawing(true);
+        const id = uuidv4();
+        setCurrentId(id);
         setAnnotation({
-          id: nextId.current++,
+          // id: nextId.current++,
+          id: id,
           x: x,
           y: y,
           width: 0,
@@ -155,7 +158,8 @@ export default React.memo(function AnnotationLayer({
           const width = x - startPoint.x;
           const height = y - startPoint.y;
 
-          if (annotation && annotation.id === nextId.current - 1) {
+          // if (annotation && annotation.id === nextId.current - 1) {
+          if (annotation && annotation.id === currentId) {
             setAnnotation({
               ...annotation,
               width:
@@ -409,20 +413,14 @@ export default React.memo(function AnnotationLayer({
     };
   }, []);
 
-  // Load Annotations
-  useEffect(() => {
-    let savedAnnotations = localStorage.getItem("annotations");
-    if (savedAnnotations) {
-      setAnnotations(JSON.parse(savedAnnotations));
-      nextId.current = JSON.parse(savedAnnotations).length;
-    }
-  }, []);
-
-  // If a user changes the selected file, there should be loading of the new annotations for the selected file
-  const id = useSearchParams().get("id");
-  useEffect(() => {
-    setAnnotations([]);
-  }, [id]);
+  // // Load Annotations
+  // useEffect(() => {
+  //   let savedAnnotations = localStorage.getItem("annotations");
+  //   if (savedAnnotations) {
+  //     setAnnotations(JSON.parse(savedAnnotations));
+  //     nextId.current = JSON.parse(savedAnnotations).length;
+  //   }
+  // }, []);
 
   return (
     <div className="relative size-full bg-light/50 rounded-[10px] p-[10px] ">
@@ -445,8 +443,8 @@ export default React.memo(function AnnotationLayer({
         />
         {displayedAnnotations.map((annotation) => (
           <Annotation
-            imageRef={imageRef}
             key={annotation.id}
+            imageRef={imageRef}
             annotation={annotation}
             couldMove={!isDrawingEnabled}
             applyTransition={applyTransition}

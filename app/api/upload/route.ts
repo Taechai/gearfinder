@@ -90,6 +90,6 @@ export async function POST(request: NextRequest) {
 // Checking the user's first connection should be done once a time, and then update the token in the middleware
 // The middleware should be run on all the requests, I have a problem when I do that, the css seem to be deactivated
 // If a user changes the selected file, there should be loading of the new annotations for the selected file
-
+// If the user is in /ml-setup/fileId and he switches the project
 
 // Need to fix the error I have in: ./app/(main)/ml-setup/[fileId]/page.tsx [FIXED]

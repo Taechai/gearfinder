@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirecting to /create when it's the user's first connection
-  if (!request.nextUrl.pathname.includes("/create-new")) {
+  if (!request.nextUrl.pathname.includes("/create")) {
     const userId = token.id
     const apiUrl = new URL(`api/check-first-connection?userId=${userId}`, request.nextUrl.origin)
     const response = await (await fetch(apiUrl, { method: "GET" })).json();

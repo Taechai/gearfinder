@@ -1,7 +1,7 @@
 import { atom } from "recoil";
 
 interface Annotation {
-  id: number;
+  id: string;
   x: number;
   y: number;
   width: number;

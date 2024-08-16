@@ -7,7 +7,7 @@ export default function CreateProjectPage() {
   return (
     <div className="flex flex-col justify-center items-center size-full gap-[10px] cursor-pointer">
       <Link
-        href={"/create/new"}
+        href={"/create-project"}
         className={`${galindo.className} text-[200px] text-dark h-[200px]`}
       >
         +

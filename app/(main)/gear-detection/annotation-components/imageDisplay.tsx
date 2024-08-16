@@ -16,33 +16,34 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { totalOffsetSelector } from "./atoms/annotationSelectors";
 import React from "react";
 import { useSearchParams } from "next/navigation";
+import { projectFilesAtom } from "../../projectAtom";
 
-const files = [
-  {
-    fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
-    filePath: "/reconstructed/5ea2a3f8-e159-4beb-8a69-83de45749c8e.png",
-  },
-  {
-    fileId: "14efabce-1f81-4b8b-9246-3b771e0d3999",
-    filePath: "/reconstructed/14efabce-1f81-4b8b-9246-3b771e0d3999.png",
-  },
-  {
-    fileId: "20e20776-c959-4c9b-87be-1038a3327453",
-    filePath: "/reconstructed/20e20776-c959-4c9b-87be-1038a3327453.png",
-  },
-  {
-    fileId: "1461401f-46bb-4731-b7d7-0c8621937790",
-    filePath: "/reconstructed/1461401f-46bb-4731-b7d7-0c8621937790.png",
-  },
-  {
-    fileId: "ae759aaa-06fa-4b00-b0a3-c29fa9775163",
-    filePath: "/reconstructed/ae759aaa-06fa-4b00-b0a3-c29fa9775163.png",
-  },
-  {
-    fileId: "be4e7bf4-77ec-41df-8de5-ad39f2461540",
-    filePath: "/reconstructed/be4e7bf4-77ec-41df-8de5-ad39f2461540.png",
-  },
-];
+// const projectFiles = [
+//   {
+//     fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
+//     filePath: "/reconstructed/5ea2a3f8-e159-4beb-8a69-83de45749c8e.png",
+//   },
+//   {
+//     fileId: "03e0d087-ac22-4fc5-9722-3b2a9f845b92",
+//     filePath: "/reconstructed/03e0d087-ac22-4fc5-9722-3b2a9f845b92.png",
+//   },
+//   {
+//     fileId: "19b244d5-6557-45de-babd-396c755e3ce1",
+//     filePath: "/reconstructed/19b244d5-6557-45de-babd-396c755e3ce1.png",
+//   },
+//   {
+//     fileId: "32143faa-a3c8-48f0-959f-f3065a7d6280",
+//     filePath: "/reconstructed/32143faa-a3c8-48f0-959f-f3065a7d6280.png",
+//   },
+//   {
+//     fileId: "c7087eae-eaba-4ff9-a030-94ab38c71d60",
+//     filePath: "/reconstructed/c7087eae-eaba-4ff9-a030-94ab38c71d60.png",
+//   },
+//   {
+//     fileId: "ce4215e9-35cb-4337-bcff-cce8776b93a3",
+//     filePath: "/reconstructed/ce4215e9-35cb-4337-bcff-cce8776b93a3.png",
+//   },
+// ];
 
 export default React.memo(function ImageDisplay({
   imageRef,
@@ -70,6 +71,8 @@ export default React.memo(function ImageDisplay({
   const setInitialOffset = useSetRecoilState(initialOffsetAtom);
   const setMemoryOffset = useSetRecoilState(memoryOffsetAtom);
 
+  const projectFiles = useRecoilValue(projectFilesAtom);
+
   const handleImageLoad = useCallback(() => {
     setIsImgLoaded(true);
   }, []);
@@ -78,11 +81,11 @@ export default React.memo(function ImageDisplay({
 
   // Set the image src whenever the user changes the file
   useEffect(() => {
-    const selectedFile = files.find(({ fileId }) => fileId == id);
-    if (selectedFile?.filePath) {
-      setSrc(selectedFile.filePath);
+    const selectedFile = projectFiles.find(({ fileId }) => fileId == id);
+    if (selectedFile?.imagePath) {
+      setSrc(selectedFile.imagePath);
     } else setSrc("");
-  }, [id]);
+  }, [id, projectFiles]);
 
   // Set the initialZoomLevel and Image Size when the image is loaded
   useEffect(() => {

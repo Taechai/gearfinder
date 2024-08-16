@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import Button from "@/app/components/button";
 import { ShareIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
+
 interface navState {
   [key: string]: { isChecked: boolean; label: string }; // Index signature
 

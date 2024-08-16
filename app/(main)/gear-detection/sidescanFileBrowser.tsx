@@ -6,51 +6,60 @@ import Filter from "../components/filter";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRecoilValue } from "recoil";
-import { currentProjectAtom } from "../projectAtom";
+import { projectFilesAtom } from "../projectAtom";
 
-const files = [
-  {
-    fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
-    fileName: "File 1",
-    state: "annotated",
-  },
-  {
-    fileId: "14efabce-1f81-4b8b-9246-3b771e0d3999",
-    fileName: "File 2",
-    state: "annotated",
-  },
-  {
-    fileId: "20e20776-c959-4c9b-87be-1038a3327453",
-    fileName: "File 3",
-    state: "unassigned",
-  },
-  {
-    fileId: "1461401f-46bb-4731-b7d7-0c8621937790",
-    fileName: "File 4",
-    state: "annotated",
-  },
-  {
-    fileId: "ae759aaa-06fa-4b00-b0a3-c29fa9775163",
-    fileName: "File 5",
-    state: "unassigned",
-  },
-  {
-    fileId: "be4e7bf4-77ec-41df-8de5-ad39f2461540",
-    fileName: "File 6",
-    state: "unassigned",
-  },
-];
+// const projectFiles = [
+//   {
+//     fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
+//     fileName: "File 1",
+//     state: "annotated",
+//   },
+//   {
+//     fileId: "14efabce-1f81-4b8b-9246-3b771e0d3999",
+//     fileName: "File 2",
+//     state: "annotated",
+//   },
+//   {
+//     fileId: "20e20776-c959-4c9b-87be-1038a3327453",
+//     fileName: "File 3",
+//     state: "unassigned",
+//   },
+//   {
+//     fileId: "1461401f-46bb-4731-b7d7-0c8621937790",
+//     fileName: "File 4",
+//     state: "annotated",
+//   },
+//   {
+//     fileId: "ae759aaa-06fa-4b00-b0a3-c29fa9775163",
+//     fileName: "File 5",
+//     state: "unassigned",
+//   },
+//   {
+//     fileId: "be4e7bf4-77ec-41df-8de5-ad39f2461540",
+//     fileName: "File 6",
+//     state: "unassigned",
+//   },
+// ];
 
 export default function SidescanFileBrowser() {
+  const projectFiles = useRecoilValue(projectFilesAtom);
   const [filteredFiles, setFilteredFiles] = useState<
     { fileId: string; fileName: string; state: string }[]
   >([]);
   const selectedFileId = useSearchParams().get("id") || "";
+  // const [filterBy, setFilterBy] = useState<string[]>(() => {
+  //   const selectedFile = projectFiles.find(
+  //     ({ fileId }) => fileId === selectedFileId
+  //   );
+  //   return [selectedFile ? selectedFile.state : "unassigned"];
+  // });
 
-  const [filterBy, setFilterBy] = useState<string[]>(() => {
-    const selectedFile = files.find(({ fileId }) => fileId === selectedFileId);
-    return [selectedFile ? selectedFile.state : "unassigned"];
-  });
+  const [filterBy, setFilterBy] = useState<string[]>([
+    "all",
+    "unassigned",
+    "annotated",
+  ]);
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const router = useRouter();
@@ -62,7 +71,7 @@ export default function SidescanFileBrowser() {
     }
     setFilterBy(filterBy);
     setFilteredFiles(
-      files.filter(
+      projectFiles.filter(
         ({ fileName, state }) =>
           filterBy.includes(state) &&
           fileName.toLowerCase().includes(searchQuery)
@@ -75,7 +84,7 @@ export default function SidescanFileBrowser() {
     setSearchQuery(searchQuery);
 
     setFilteredFiles(
-      files.filter(
+      projectFiles.filter(
         ({ fileName, state }) =>
           fileName.toLowerCase().includes(searchQuery) &&
           filterBy.includes(state)
@@ -90,8 +99,10 @@ export default function SidescanFileBrowser() {
   };
 
   useEffect(() => {
-    setFilteredFiles(files.filter(({ state }) => filterBy.includes(state)));
-  }, []);
+    setFilteredFiles(
+      projectFiles.filter(({ state }) => filterBy.includes(state))
+    );
+  }, [projectFiles]);
 
   return (
     <>

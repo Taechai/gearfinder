@@ -2,6 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { validateProject } from "@/app/lib/utils";
 
 export async function POST(request: NextRequest) {
     const { currentProject } = await request.json()
@@ -16,24 +17,21 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = Number(token.id)
-    const userProjects: any = await prisma.user.findFirst({
-        where: { id: userId },
-        select: {
-            projectsOwned: {
-                where: { projectName: currentProject.name },
-                select: { projectName: true }
-            },
-            accessibleProjects: {
-                where: { projectName: currentProject.name },
-                select: { projectName: true }
-            }
-        }
-    })
+    const projectId = await validateProject(userId, currentProject.name)
 
-    const isValidProject = userProjects.projectsOwned.length > 0 || userProjects.accessibleProjects.length > 0;
-    if (!isValidProject) {
+    if (!projectId) {
         return NextResponse.json({ message: "Unauthorized project access." }, { status: 403 });
     }
+
+    const files = await prisma.file.findMany({
+        where: { projectId: projectId },
+        select: {
+            reconstructedImage: { select: { imagePath: true, annotations: { select: { id: true } } } },
+            fileName: true,
+            id: true
+        }
+    })
+    console.log("FILES:", files)
 
     const cookieStore = cookies()
     cookieStore.set("currentProject", currentProject.name, {
@@ -43,5 +41,13 @@ export async function POST(request: NextRequest) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7 // 1 week,
     });
-    return NextResponse.json({ message: "Uploaded Sucessfull" })
+    return NextResponse.json({
+        message: "Project switched succesfully",
+        files: [...files.map(({ reconstructedImage, fileName, id }) => ({
+            imagePath: reconstructedImage?.imagePath ?? "",
+            fileName,
+            fileId: id,
+            state: reconstructedImage?.annotations.length == 0 ? "unassigned" : "annotated"
+        }))]
+    })
 }
