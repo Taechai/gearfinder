@@ -1,7 +1,11 @@
 "use client";
 import ListBox from "@/app/components/listBox";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { currentProjectAtom, projectFilesAtom } from "../projectAtom";
+import {
+  currentProjectAtom,
+  projectClassesAtom,
+  projectFilesAtom,
+} from "../projectAtom";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -17,6 +21,7 @@ export default function ProjectsList({
   const [currentProject, setCurrentProject] =
     useRecoilState(currentProjectAtom);
   const setProjectFiles = useSetRecoilState(projectFilesAtom);
+  const setProjectClasses = useSetRecoilState(projectClassesAtom);
   const [projectsList, setProjectsList] = useState<Project[]>([]);
 
   useEffect(() => {
@@ -48,9 +53,10 @@ export default function ProjectsList({
         body: JSON.stringify({ currentProject }),
       })
         .then((res) => res.json())
-        .then((data) => {
-          setProjectFiles(data.files);
-          const fileIds = data.files
+        .then(({ files, projectClasses }) => {
+          setProjectFiles(files);
+          setProjectClasses(projectClasses);
+          const fileIds = files
             .filter(({ id }: { id: string }) => id == id)
             .map(({ fileId }: { fileId: string }) => `${fileId}`);
           if (!fileIds.includes(id)) {

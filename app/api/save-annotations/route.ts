@@ -59,7 +59,7 @@ export async function POST(request: NextRequest
             width: annotation.width,
             height: annotation.height,
         },
-        className: "Fishing Gear",
+        className: annotation.className,
         coordinate: {
             x: "Not Available",
             y: "Not Available",
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest
                 width: annotation.width,
                 height: annotation.height,
             },
-            className: "Fishing Gear",
+            className: annotation.className,
             coordinate: {
                 x: "Not Available",
                 y: "Not Available",

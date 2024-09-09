@@ -89,7 +89,13 @@ export async function POST(request: NextRequest) {
 // Do not forget to limit the size of the uploaded files
 // Checking the user's first connection should be done once a time, and then update the token in the middleware
 // The middleware should be run on all the requests, I have a problem when I do that, the css seem to be deactivated
-// If a user changes the selected file, there should be loading of the new annotations for the selected file
-// If the user is in /ml-setup/fileId and he switches the project
+// If the user is in /ml-setup/fileId and he switches the project - Handle this
+// The file's stated (annotated / unassigned) should not be based on the annotations presence, it should rely only if changes for the file are saved or not. Sometimes the image won't contain any label and it's normal.
+// sideScanFileBrowser: Need to display color based on state (Unassigned / Annotated)
 
+
+// Need to change the way i get project classes (should be directly selecting unique classes from the database) [DONE]
+// Need to bring the classes based on all the available classes in the server, once the project is loaded, the classes are loaded also. [DONE]
+// When a new class is added, the project classes have to be updated, just locally. When the project is going to be loaded again it gonna bring the new added classes. [DONE]
+// If a user changes the selected file, there should be loading of the new annotations for the selected file [DONE]
 // Need to fix the error I have in: ./app/(main)/ml-setup/[fileId]/page.tsx [FIXED]

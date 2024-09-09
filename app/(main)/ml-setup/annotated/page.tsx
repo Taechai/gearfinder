@@ -1,24 +1,40 @@
-// import { DocumentIcon } from "@heroicons/react/20/solid";
+"use client";
+
 import { DocumentIcon } from "@/app/icons/myIcons";
 import Link from "next/link";
+import { useMemo } from "react";
+import { useRecoilValue } from "recoil";
+import { projectFilesAtom } from "../../projectAtom";
+
 export default function Page() {
+  const projectFiles = useRecoilValue(projectFilesAtom);
+  const projectFilesAnnotated = useMemo(
+    () => projectFiles.filter(({ state }) => state == "annotated"),
+    [projectFiles]
+  );
+
   return (
-    <div className="col-span-2 row-span-2 flex flex-wrap gap-[10px] h-fit">
-      {[
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-        21, 22,
-      ].map((index) => (
-        <Link
-          href={`/ml-setup/file${index}`}
-          key={index}
-          className=" hover:bg-success-light/10 rounded-[10px] cursor-pointer p-[10px] transition-all"
-        >
-          <DocumentIcon className="text-success-dark/80 size-[60px]" />
-          <p className="text-center text-md text-success-dark font-semibold">
-            File {index}
-          </p>
-        </Link>
-      ))}
-    </div>
+    <>
+      {projectFilesAnnotated.length > 0 ? (
+        <div className="col-span-2 row-span-2 flex flex-wrap gap-[10px] h-fit ">
+          {projectFilesAnnotated.map(({ fileId, fileName }) => (
+            <Link
+              href={`/ml-setup/annotate?id=${fileId}&fileName=${fileName}`}
+              key={fileId}
+              className=" hover:bg-success-light/10 rounded-[10px] cursor-pointer p-[10px] transition-all"
+            >
+              <DocumentIcon className="text-success-dark/80 size-[60px] mx-auto" />
+              <p className="text-center text-md text-success-dark font-semibold">
+                {fileName}
+              </p>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="col-span-2 flex justify-center items-center text-success-dark/50 font-bold text-lg">
+          Zero annotated files found
+        </div>
+      )}
+    </>
   );
 }

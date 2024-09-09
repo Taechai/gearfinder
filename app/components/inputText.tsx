@@ -1,4 +1,4 @@
-import { ChangeEventHandler } from "react";
+import { ChangeEventHandler, RefObject } from "react";
 
 export default function InputText({
   Icon,
@@ -8,12 +8,14 @@ export default function InputText({
   placeholder,
   otherTwClass = null,
   value = undefined,
+  defaultValue = undefined,
   required = false,
   onChange = undefined,
   twText = "text-md",
   removeIconBg = false,
   iconSize = "size-[20px]",
   disabled = false,
+  inputRef = undefined,
 }: {
   Icon: React.ComponentType<{
     className?: string;
@@ -24,18 +26,21 @@ export default function InputText({
   placeholder: string;
   required?: boolean;
   value?: string | number | readonly string[] | undefined;
+  defaultValue?: string;
   onChange?: ChangeEventHandler<HTMLInputElement> | undefined;
   otherTwClass?: string | null;
   twText?: string;
   removeIconBg?: boolean;
   iconSize?: string;
   disabled?: boolean;
+  inputRef?: RefObject<HTMLInputElement>;
 }) {
   return (
     <div
       className={`${otherTwClass} flex pointer-events-none flex-row-reverse gap-[10px] ring-0 ring-dark justify-center items-center focus-within:bg-light/80 focus-within:ring-[1px] bg-light/50 transition-all rounded-[10px] px-[10px] py-[15px]`}
     >
       <input
+        ref={inputRef}
         type={type}
         name={name}
         id={id}
@@ -43,6 +48,7 @@ export default function InputText({
         placeholder={placeholder}
         required={required}
         value={value}
+        defaultValue={defaultValue}
         onChange={onChange}
         disabled={disabled}
       />

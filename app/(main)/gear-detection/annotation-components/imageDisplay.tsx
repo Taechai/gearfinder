@@ -1,6 +1,4 @@
 import { useCallback, RefObject, useEffect } from "react";
-import SonarImage from "@/public/SonarImage.png";
-
 import {
   applyTransitionAtom,
   imageSizeAtom,
@@ -17,33 +15,6 @@ import { totalOffsetSelector } from "./atoms/annotationSelectors";
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import { projectFilesAtom } from "../../projectAtom";
-
-// const projectFiles = [
-//   {
-//     fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
-//     filePath: "/reconstructed/5ea2a3f8-e159-4beb-8a69-83de45749c8e.png",
-//   },
-//   {
-//     fileId: "03e0d087-ac22-4fc5-9722-3b2a9f845b92",
-//     filePath: "/reconstructed/03e0d087-ac22-4fc5-9722-3b2a9f845b92.png",
-//   },
-//   {
-//     fileId: "19b244d5-6557-45de-babd-396c755e3ce1",
-//     filePath: "/reconstructed/19b244d5-6557-45de-babd-396c755e3ce1.png",
-//   },
-//   {
-//     fileId: "32143faa-a3c8-48f0-959f-f3065a7d6280",
-//     filePath: "/reconstructed/32143faa-a3c8-48f0-959f-f3065a7d6280.png",
-//   },
-//   {
-//     fileId: "c7087eae-eaba-4ff9-a030-94ab38c71d60",
-//     filePath: "/reconstructed/c7087eae-eaba-4ff9-a030-94ab38c71d60.png",
-//   },
-//   {
-//     fileId: "ce4215e9-35cb-4337-bcff-cce8776b93a3",
-//     filePath: "/reconstructed/ce4215e9-35cb-4337-bcff-cce8776b93a3.png",
-//   },
-// ];
 
 export default React.memo(function ImageDisplay({
   imageRef,
@@ -75,6 +46,7 @@ export default React.memo(function ImageDisplay({
 
   const handleImageLoad = useCallback(() => {
     setIsImgLoaded(true);
+    console.log("LOADED");
   }, []);
 
   const id = useSearchParams().get("id");

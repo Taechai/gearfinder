@@ -1,20 +1,17 @@
 "use client";
+
 import Button from "@/app/components/button";
 import { BrainIcon, SaveIcon } from "@/app/icons/myIcons";
 import ImageAnnotator from "./imageAnnotator";
 import { useSearchParams } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { annotationsAtom } from "./annotation-components/atoms/annotationAtoms";
-import { useEffect } from "react";
 import { projectFilesAtom } from "../projectAtom";
 export default function Page() {
   const fileName = useSearchParams().get("fileName") || "";
   const annotations = useRecoilValue(annotationsAtom);
   const setProjectFiles = useSetRecoilState(projectFilesAtom);
 
-  useEffect(() => {
-    console.log(annotations);
-  }, [annotations]);
   const fileId = useSearchParams().get("id");
   const handleSaveAnnotations = () => {
     fetch("/api/save-annotations", {
@@ -60,9 +57,7 @@ export default function Page() {
         </div>
       </div>
 
-      {/* <RecoilRoot> */}
       <ImageAnnotator />
-      {/* </RecoilRoot> */}
     </>
   );
 }

@@ -7,6 +7,10 @@ import prisma from "@/app/lib/prisma";
 export async function GET(request: NextRequest) {
     const fileId = request.nextUrl.searchParams.get("id")
 
+    if (isNaN(Number(fileId))) {
+        return NextResponse.json({ message: "Invalid file ID provided." }, { status: 400 });
+    }
+
     // Check if the user is logged in
     const token = await getToken({ req: request })
     if (!token) {

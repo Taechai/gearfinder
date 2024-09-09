@@ -14,3 +14,8 @@ export const projectFilesAtom = atom<{
     key: "projectFilesAtom",
     default: [],
 });
+
+export const projectClassesAtom = atom<string[]>({
+    key: 'projectClassesAtom',
+    default: []
+})

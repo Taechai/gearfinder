@@ -74,30 +74,28 @@ export default function ImageAnnotator() {
     // If a user changes the selected file, there should be loading of the new annotations for the selected file
     setAnnotations([]);
     if (fileId) {
-      console.log("Fetching the corresponding annotations");
       fetch(`/api/get-annotations?id=${fileId}`, { method: "GET" })
         .then((res) => res.json())
         .then(({ annotations }) => {
-          console.log("Annotations for file", fileId);
-          console.log(annotations);
-          setAnnotations(() =>
-            annotations.map(
-              ({
-                id,
-                boundingBox,
-              }: {
-                id: number | string;
-                boundingBox: {};
-              }) => ({ id, ...boundingBox })
-            )
-          );
+          if (annotations) {
+            setAnnotations(() =>
+              annotations.map(
+                ({
+                  id,
+                  boundingBox,
+                  className,
+                }: {
+                  id: number | string;
+                  boundingBox: {};
+                  className: string;
+                }) => ({ id, ...boundingBox, className })
+              )
+            );
+          }
         });
     }
   }, [fileId]);
-  // useEffect(() => {
-  //   // To avoid trying to fetch annotations for file that doesn't belong to the current project
-  //   router.replace(pathname);
-  // }, [currentProject]);
+
   return (
     <>
       <AnnotationLayer

@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback } from "react";
+import React, { RefObject, useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   annotationAtom,
@@ -7,30 +7,27 @@ import {
   isAnnotResizingEnabledAtom,
   selectedAnnotationAtom,
   startPointAtom,
+  Annotation,
 } from "./atoms/annotationAtoms";
 import { totalOffsetSelector } from "./atoms/annotationSelectors";
-import { XMarkIcon } from "@heroicons/react/20/solid";
-
-interface Annotation {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import AnnotationEditor from "./annotationEditor";
 
 export default React.memo(function Annotation({
   couldMove,
   applyTransition,
   showLabel,
   annotation,
+  tempAnnotation = false,
   imageRef,
+  containerRef,
 }: {
   couldMove: boolean;
   applyTransition: boolean;
   showLabel?: boolean;
   annotation: Annotation;
+  tempAnnotation?: boolean;
   imageRef: RefObject<HTMLImageElement>;
+  containerRef: RefObject<HTMLDivElement>;
 }) {
   const [annotations, setAnnotations] = useRecoilState(annotationsAtom);
 
@@ -105,11 +102,19 @@ export default React.memo(function Annotation({
       );
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (!tempAnnotation && annotation.className.trim() == "") {
+      setIsOpen(true);
+    }
+  }, []);
   return (
     <>
       {/* <div className="size-fit"> */}
       <div
-        className={`absolute border-[2px] border-red-700 origin-top-left group ${
+        className={`absolute border-[2px] ${
+          isOpen ? "border-error-main" : "border-red-700"
+        }  origin-top-left group ${
           couldMove ? "hover:bg-white/20 cursor-move" : "pointer-events-none"
         }  ${applyTransition ? "transition-all" : "transition-colors"}`}
         onMouseDown={(e) => handleMouseDown(e, annotation)}
@@ -134,17 +139,32 @@ export default React.memo(function Annotation({
       {showLabel && (
         <span
           draggable={false}
-          className={`absolute bg-red-700 text-white text-sm px-[3px] select-none ${
-            applyTransition && "transition-all"
+          className={`absolute ${
+            isOpen ? "bg-error-main" : "bg-red-700"
+          } text-white text-sm px-[3px] select-none max-w-[100px] text-nowrap text-ellipsis overflow-hidden ${
+            (applyTransition || isOpen) && "transition-all"
           } ${couldMove ? "cursor-pointer" : "pointer-events-none"}`}
           style={{
             left: `${annotation.x}px`,
             top: `${annotation.y - 15}px`,
           }}
+          onClick={() => {
+            setIsOpen(true);
+          }}
         >
-          Fishing Gear
+          {annotation.className}
         </span>
       )}
+
+      <AnnotationEditor
+        isOpen={isOpen}
+        containerRef={containerRef}
+        initialValue={annotation.className}
+        onClose={() => {
+          setIsOpen(false);
+        }}
+        annotation={annotation}
+      />
       {/* </div> */}
     </>
   );

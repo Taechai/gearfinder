@@ -26,13 +26,25 @@ export async function POST(request: NextRequest) {
     const files = await prisma.file.findMany({
         where: { projectId: projectId },
         select: {
-            reconstructedImage: { select: { imagePath: true, annotations: { select: { id: true } } } },
+            reconstructedImage: { select: { imagePath: true, annotations: { select: { id: true, className: true } } } },
             fileName: true,
             id: true
         }
     })
-    console.log("FILES:", files)
 
+    // Getting unique project classes
+    const annotationIds = files.flatMap(({ reconstructedImage }) =>
+        reconstructedImage?.annotations.map(({ id }) => id) || []
+    );
+    const uniqueProjectClasses = (await prisma.annotation.findMany({
+        select: { className: true },
+        distinct: ['className'],
+        where: { id: { in: annotationIds } },
+        orderBy: { className: "asc" }
+    })).map(({ className }) => className)
+
+
+    // Storing the current project in the cookies
     const cookieStore = cookies()
     cookieStore.set("currentProject", currentProject.name, {
         httpOnly: true,
@@ -48,6 +60,7 @@ export async function POST(request: NextRequest) {
             fileName,
             fileId: id,
             state: reconstructedImage?.annotations.length == 0 ? "unassigned" : "annotated"
-        }))]
+        }))],
+        projectClasses: uniqueProjectClasses
     })
 }

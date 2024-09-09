@@ -1,7 +1,6 @@
 "use client";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { BoatIcon } from "../icons/myIcons";
 export default function Modal({
   title,
   Icon,
@@ -53,16 +52,6 @@ export default function Modal({
                 {title}
                 {Icon && <Icon className="text-dark size-[20px]" />}
               </Dialog.Title>
-              {/* <div className="grid grid-cols-2 gap-[10px] text-md text-dark/70">
-                <p className="font-semibold text-dark">Speed</p>
-                <p>2.72m/s</p>
-                <p className="font-semibold text-dark">Depth</p>
-                <p>0</p>
-                <p className="font-semibold text-dark">Altitude</p>
-                <p>0</p>
-                <p className="font-semibold text-dark">Gyro</p>
-                <p>254.8</p>
-              </div> */}
               {children}
             </Dialog.Panel>
           </Transition.Child>

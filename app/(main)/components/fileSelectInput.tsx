@@ -5,12 +5,14 @@ export default function FileSelectInput({
   label,
   name,
   selectedFileId,
+  state,
   onChange,
 }: {
   fileId: string;
   label: string;
   name: string;
   selectedFileId: string;
+  state: string;
   onChange: ChangeEventHandler;
 }) {
   return (
@@ -28,16 +30,34 @@ export default function FileSelectInput({
         value={label}
         checked={fileId == selectedFileId}
       />
-      <div className="z-[-1] absolute size-full rounded-[10px] bg-black/5 border-[1px] border-black/40 peer-checked/radio:bg-primary-light peer-checked/radio:border-primary-dark" />
+      <div
+        className={`z-[-1] absolute size-full rounded-[10px] transition-all duration-300 ${
+          state == "unassigned"
+            ? "bg-error-dark/5 border-[1px] border-error-dark/40 peer-checked/radio:bg-error-light/40 peer-checked/radio:border-error-dark"
+            : "bg-success-dark/5 border-[1px] border-success-dark/40 peer-checked/radio:bg-success-light/40 peer-checked/radio:border-success-dark"
+        }`}
+      />
       <DocumentTextIcon
-        className={`size-[15px] transition-all duration-300 text-black/50 peer-checked/radio:text-primary-dark`}
+        className={`size-[15px] transition-all duration-300 ${
+          state == "unassigned"
+            ? "text-error-dark/80 peer-checked/radio:text-error-dark"
+            : "text-success-dark/80 peer-checked/radio:text-success-dark"
+        }`}
       />
       <p
-        className={`w-full pointer-events-auto peer bg-transparent text-sm text-black/50 peer-checked/radio:text-primary-dark font-normal`}
+        className={`w-full pointer-events-auto peer bg-transparent text-sm transition-all duration-300 ${
+          state == "unassigned"
+            ? "text-error-dark/80 peer-checked/radio:text-error-dark"
+            : "text-success-dark/80 peer-checked/radio:text-success-dark"
+        } font-normal`}
       >
         {label}
       </p>
-      <CheckCircleIcon className="size-[15px] opacity-0 scale-90 text-primary-dark hover:scale-110 cursor-pointer transition-all duration-300 ease-in-out peer-checked/radio:opacity-100 peer-checked/radio:scale-100" />
+      <CheckCircleIcon
+        className={`size-[15px] opacity-0 scale-90 hover:scale-110 cursor-pointer ease-in-out transition-all duration-300 peer-checked/radio:opacity-100 peer-checked/radio:scale-100 ${
+          state == "unassigned" ? "text-error-dark" : "text-success-dark"
+        }`}
+      />
     </label>
   );
 }

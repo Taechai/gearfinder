@@ -7,39 +7,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { projectFilesAtom } from "../projectAtom";
-
-// const projectFiles = [
-//   {
-//     fileId: "5ea2a3f8-e159-4beb-8a69-83de45749c8e",
-//     fileName: "File 1",
-//     state: "annotated",
-//   },
-//   {
-//     fileId: "14efabce-1f81-4b8b-9246-3b771e0d3999",
-//     fileName: "File 2",
-//     state: "annotated",
-//   },
-//   {
-//     fileId: "20e20776-c959-4c9b-87be-1038a3327453",
-//     fileName: "File 3",
-//     state: "unassigned",
-//   },
-//   {
-//     fileId: "1461401f-46bb-4731-b7d7-0c8621937790",
-//     fileName: "File 4",
-//     state: "annotated",
-//   },
-//   {
-//     fileId: "ae759aaa-06fa-4b00-b0a3-c29fa9775163",
-//     fileName: "File 5",
-//     state: "unassigned",
-//   },
-//   {
-//     fileId: "be4e7bf4-77ec-41df-8de5-ad39f2461540",
-//     fileName: "File 6",
-//     state: "unassigned",
-//   },
-// ];
+import Link from "next/link";
 
 export default function SidescanFileBrowser() {
   const projectFiles = useRecoilValue(projectFilesAtom);
@@ -111,9 +79,12 @@ export default function SidescanFileBrowser() {
       </h1>
       <div className="rounded-[10px] flex gap-[10px] p-[1px] items-center ">
         <SearchBar onChange={handleSearchChange} />
-        <button className="group p-[10.75px] aspect-square bg-dark/5 rounded-[10px] flex justify-center items-center hover:bg-dark  focus:bg-dark/90 cursor-pointer transition-all">
+        <Link
+          href={"/ml-setup/upload-file"}
+          className="group p-[10.75px] aspect-square bg-dark/5 rounded-[10px] flex justify-center items-center hover:bg-dark  focus:bg-dark/90 cursor-pointer transition-all"
+        >
           <ArrowUpTrayIcon className="size-[15px] text-dark stroke-current stroke-[1px] group-hover:text-white group-focus:text-white transition-all" />
-        </button>
+        </Link>
       </div>
 
       <Filter
@@ -123,11 +94,12 @@ export default function SidescanFileBrowser() {
       />
       {filteredFiles.length != 0 ? (
         <div className="flex flex-col gap-[5px] overflow-auto">
-          {filteredFiles.map(({ fileId, fileName }) => (
+          {filteredFiles.map(({ fileId, fileName, state }) => (
             <FileSelectInput
               key={fileId}
               fileId={fileId}
               label={fileName}
+              state={state}
               name="file-selection"
               selectedFileId={selectedFileId}
               onChange={handleFileChange}

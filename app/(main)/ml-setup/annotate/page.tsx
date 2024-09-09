@@ -1,13 +1,39 @@
 "use client";
+
 import Button from "@/app/components/button";
 import { BrainIcon, SaveIcon } from "@/app/icons/myIcons";
-import { RecoilRoot } from "recoil";
 import { useSearchParams } from "next/navigation";
 import ImageAnnotator from "../../gear-detection/imageAnnotator";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { annotationsAtom } from "../../gear-detection/annotation-components/atoms/annotationAtoms";
+import { projectFilesAtom } from "../../projectAtom";
 
 export default function Page() {
   const fileName = useSearchParams().get("fileName") || "";
+  const annotations = useRecoilValue(annotationsAtom);
+  const setProjectFiles = useSetRecoilState(projectFilesAtom);
 
+  const fileId = useSearchParams().get("id");
+  const handleSaveAnnotations = () => {
+    fetch("/api/save-annotations", {
+      method: "POST",
+      body: JSON.stringify({
+        fileId,
+        annotations,
+      }),
+    }).then(() => {
+      setProjectFiles((prev) =>
+        prev.map((prev) => {
+          if (prev.fileId == fileId) {
+            return {
+              ...prev,
+              state: annotations.length > 0 ? "annotated" : "unassigned",
+            };
+          } else return prev;
+        })
+      );
+    });
+  };
   return (
     <>
       {/* Header of the main part */}
@@ -27,13 +53,12 @@ export default function Page() {
             otherTwClass={"bg-success-light/50 !text-success-dark !font-bold"}
             twHover="hover:bg-success-light/60"
             twFocus="focus:ring-[3px] focus:ring-success-dark/50"
+            onClick={handleSaveAnnotations}
           />
         </div>
       </div>
 
-      {/* <RecoilRoot> */}
       <ImageAnnotator />
-      {/* </RecoilRoot> */}
     </>
   );
 }

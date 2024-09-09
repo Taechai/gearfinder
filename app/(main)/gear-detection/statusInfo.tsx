@@ -1,3 +1,4 @@
+"use client";
 import ButtonModal from "@/app/components/buttonModal";
 import { BoatIcon, SensorIcon, WaterIcon } from "@/app/icons/myIcons";
 

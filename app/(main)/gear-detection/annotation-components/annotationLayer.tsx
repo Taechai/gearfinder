@@ -1,4 +1,4 @@
-// Done: When I drage a box and the cursor is out of the container it should unfocus
+// Done: When I drag a box and the cursor is out of the container it should unfocus
 // When drawing a box, we should be able to resize and pan it
 import { v4 as uuidv4 } from "uuid";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -26,7 +26,7 @@ import {
 } from "./atoms/annotationSelectors";
 import Annotation from "./annotation";
 import ImageDisplay from "./imageDisplay";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useState } from "react";
 import { throttle } from "lodash";
 import React from "react";
 
@@ -70,7 +70,7 @@ export default React.memo(function AnnotationLayer({
 
   // const [isImgLoaded, setIsImgLoaded] = useRecoilState(isImgLoadedAtom);
 
-  const setAnnotations = useSetRecoilState(annotationsAtom);
+  const [annotations, setAnnotations] = useRecoilState(annotationsAtom);
   const [annotation, setAnnotation] = useRecoilState(annotationAtom);
   const [startPoint, setStartPoint] = useRecoilState(startPointAtom);
 
@@ -129,6 +129,7 @@ export default React.memo(function AnnotationLayer({
           y: y,
           width: 0,
           height: 0,
+          className: "",
         });
       } else if (isPanningEnabled) {
         containerRef.current?.classList.add("cursor-grabbing");
@@ -272,6 +273,7 @@ export default React.memo(function AnnotationLayer({
     if (isDrawingEnabled && annotation) {
       setIsDrawing(false);
       // The array have normalized annotations => no negative width or height even if the user draws in the reverse sense
+      console.log("Annotation Added #1: Should show the annotation editor");
       setAnnotations((prevAnnotations) => [
         ...prevAnnotations,
         {
@@ -288,6 +290,7 @@ export default React.memo(function AnnotationLayer({
           height: Math.abs((annotation.height * 100) / zoomLevel),
         },
       ]);
+
       setAnnotation(null);
     } else if (
       isPanningEnabled &&
@@ -413,15 +416,6 @@ export default React.memo(function AnnotationLayer({
     };
   }, []);
 
-  // // Load Annotations
-  // useEffect(() => {
-  //   let savedAnnotations = localStorage.getItem("annotations");
-  //   if (savedAnnotations) {
-  //     setAnnotations(JSON.parse(savedAnnotations));
-  //     nextId.current = JSON.parse(savedAnnotations).length;
-  //   }
-  // }, []);
-
   return (
     <div className="relative size-full bg-light/50 rounded-[10px] p-[10px] ">
       {/* The container that will have the image to annotate */}
@@ -444,6 +438,7 @@ export default React.memo(function AnnotationLayer({
         {displayedAnnotations.map((annotation) => (
           <Annotation
             key={annotation.id}
+            containerRef={containerRef}
             imageRef={imageRef}
             annotation={annotation}
             couldMove={!isDrawingEnabled}
@@ -454,10 +449,12 @@ export default React.memo(function AnnotationLayer({
         {drawnAnnotation && (
           <Annotation
             imageRef={imageRef}
+            containerRef={containerRef}
             annotation={drawnAnnotation}
             couldMove={!isDrawingEnabled}
             applyTransition={applyTransition}
             showLabel={!isDrawing}
+            tempAnnotation
           />
         )}
       </div>
