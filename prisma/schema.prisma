@@ -30,13 +30,14 @@ model Project {
 
 // Tracks .xtf files and their metadata
 model File {
-    id                 Int                 @id @default(autoincrement())
-    filePath           String              @unique
-    fileName           String
-    uploadedAt         DateTime            @default(now())
-    project            Project             @relation("FilesInProject", fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    projectId          Int
-    reconstructedImage ReconstructedImage? @relation("CorrespondingImage")
+    id                     Int                      @id @default(autoincrement())
+    filePath               String                   @unique
+    fileName               String
+    uploadedAt             DateTime                 @default(now())
+    project                Project                  @relation("FilesInProject", fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    projectId              Int
+    reconstructedImage     ReconstructedImage?      @relation("CorrespondingImage")
+    imageReconstructionJob ImageReconstructionJob[]
 }
 
 // Stores information about the reconstructed images
@@ -58,4 +59,15 @@ model Annotation {
     imageId     Int
     createdAt   DateTime           @default(now())
     status      String             @default("Not Found")
+}
+
+// Image reconstruction jobs
+model ImageReconstructionJob {
+    id           Int       @id @default(autoincrement())
+    file         File      @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    fileId       Int
+    status       String    @default("pending") // Status of the job: pending, in progress, completed, failed
+    createdAt    DateTime  @default(now())
+    completedAt  DateTime?
+    errorMessage String?
 }

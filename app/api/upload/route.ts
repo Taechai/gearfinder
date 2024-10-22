@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import prisma from "@/app/lib/prisma";
 import { v4 as uuidv4 } from 'uuid';
+import { checkJobStatus } from "@/app/lib/utils";
 
 const uploadDir = path.join(process.cwd(), 'app/api/upload/uploaded-files');
 
@@ -34,10 +35,12 @@ export async function POST(request: NextRequest) {
     const uniqueFileName = `${uuidv4()}.${file.name.split(".").pop()}`;
     const filePath = path.join(uploadDir, uniqueFileName)
 
+    let fileId: number = -1
+
     // Save file metadata
     try {
         const userId = token.id
-        await prisma.project.create({
+        const projectCreationResult = await prisma.project.create({
             data: {
                 projectName: projectName as string,
                 ownerId: Number(userId),
@@ -45,6 +48,13 @@ export async function POST(request: NextRequest) {
                     create: {
                         filePath: filePath,
                         fileName: file.name
+                    }
+                }
+            },
+            include: {
+                files: {
+                    select: {
+                        id: true
                     }
                 }
             }
@@ -58,15 +68,19 @@ export async function POST(request: NextRequest) {
                     select: { id: true }
                 })
                 if (projectInfo) {
-                    await prisma.file.create({
-                        data: { filePath: filePath, projectId: projectInfo.id, fileName: file.name }
+                    const fileCreationResult = await prisma.file.create({
+                        data: { filePath: filePath, projectId: projectInfo.id, fileName: file.name, },
                     })
+                    fileId = fileCreationResult.id
                 }
             } else {
                 throw error
             }
         })
 
+        if (projectCreationResult != undefined) {
+            fileId = projectCreationResult.files[0].id
+        }
 
         // Save file 
         const fileStream = fs.createWriteStream(filePath)
@@ -75,15 +89,22 @@ export async function POST(request: NextRequest) {
         fileStream.write(fileBuffer);
         fileStream.end();
 
-        console.log("\nCreated Successfully\n")
+        // Create image reconstruction job
+        const newJob = await prisma.imageReconstructionJob.create({
+            data: { fileId: fileId },
+        })
+
+        // Wait for the job to complete
+        const job = await checkJobStatus(newJob.id);
+
+        return NextResponse.json({ message: "Uploaded Sucessfull", jobStatus: job?.status })
     } catch (error) {
-        console.log("An Error Occured:")
-        console.log(file.name)
+        console.log()
+        console.log(error)
+        console.log()
+
         return NextResponse.json({ message: "An error occured" }, { status: 400 });
     }
-
-
-    return NextResponse.json({ message: "Uploaded Sucessfull" })
 }
 
 // Do not forget to limit the size of the uploaded files

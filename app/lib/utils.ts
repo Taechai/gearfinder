@@ -24,3 +24,20 @@ export const validateProject = async (userId: number, projectName: string) => {
     return ownedProjectId ?? accessibleProjectId ?? false;
 
 }
+
+// Poll the status of the job periodically
+export const checkJobStatus = async (jobId: number, timeout = 30000, interval = 2000) => {
+    const start = Date.now();
+
+    while (Date.now() - start < timeout) {
+        const job = await prisma.imageReconstructionJob.findUnique({
+            where: { id: jobId },
+        });
+
+        if (job && (job.status === 'completed' || job.status === 'failed')) {
+            return job;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+}

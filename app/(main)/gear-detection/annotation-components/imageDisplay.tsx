@@ -1,4 +1,4 @@
-import { useCallback, RefObject, useEffect } from "react";
+import { useCallback, RefObject, useEffect, useRef } from "react";
 import {
   applyTransitionAtom,
   imageSizeAtom,
@@ -42,18 +42,65 @@ export default React.memo(function ImageDisplay({
   const setInitialOffset = useSetRecoilState(initialOffsetAtom);
   const setMemoryOffset = useSetRecoilState(memoryOffsetAtom);
 
-  const projectFiles = useRecoilValue(projectFilesAtom);
+  const [projectFiles, setProjectFiles] = useRecoilState(projectFilesAtom);
+
+  const id = useSearchParams().get("id");
+  const selectedFile = projectFiles.find(({ fileId }) => fileId == id);
 
   const handleImageLoad = useCallback(() => {
     setIsImgLoaded(true);
-    console.log("LOADED");
   }, []);
 
-  const id = useSearchParams().get("id");
+  const buttonRef = useRef<HTMLSpanElement>(null);
+  const handleReconstructImage = async () => {
+    if (!selectedFile) return;
+    console.log("RELOADING");
+
+    const button = buttonRef.current;
+    if (!button) return;
+
+    const disableButton = () => {
+      button.classList.add("pointer-events-none", "animate-pulse");
+      button.classList.remove("text-error-dark");
+    };
+
+    const enableButtonWithError = () => {
+      button.classList.remove("pointer-events-none", "animate-pulse");
+      button.classList.add("text-error-dark");
+    };
+
+    disableButton();
+
+    try {
+      const response = await fetch("/api/jobs/image-reconstruction", {
+        method: "POST",
+        body: JSON.stringify({ fileId: selectedFile.fileId }),
+      });
+      const { file } = await response.json();
+
+      if (file) {
+        const newProjectFiles = projectFiles.map((oldFile) =>
+          oldFile.fileId === file.fileId ? file : oldFile
+        );
+        setProjectFiles(newProjectFiles);
+        if (
+          file.imageReconstructionJobStatus == "failed" ||
+          file.imageReconstructionJobStatus == "in progress"
+        ) {
+          enableButtonWithError();
+        }
+        // If successful, keep the button disabled and animating
+      } else {
+        enableButtonWithError();
+      }
+    } catch (error) {
+      console.error(error);
+      enableButtonWithError();
+    }
+  };
 
   // Set the image src whenever the user changes the file
   useEffect(() => {
-    const selectedFile = projectFiles.find(({ fileId }) => fileId == id);
     if (selectedFile?.imagePath) {
       setSrc(selectedFile.imagePath);
     } else setSrc("");
@@ -92,23 +139,68 @@ export default React.memo(function ImageDisplay({
   }, [imageSize]);
 
   return (
-    <img
-      ref={imageRef}
-      src={src}
-      // src={SonarImage.src}
-      alt="Image to annotate"
-      onLoad={handleImageLoad}
-      style={{
-        width: `${imageSize.width}`,
-        height: `${imageSize.height}`,
-        transform: `translate(${offset.x}px, ${offset.y}px) scale(${
-          zoomLevel / 100
-        })`,
-      }}
-      draggable={false}
-      className={`absolute origin-top-left select-none max-w-fit  ${
-        isDrawingEnabled && "cursor-crosshair"
-      } ${applyTransition && "transition-all"}`}
-    />
+    <>
+      {selectedFile?.imageReconstructionJobStatus === "completed" ? (
+        <img
+          ref={imageRef}
+          src={src}
+          alt="Annotated Image"
+          onLoad={handleImageLoad}
+          style={{
+            width: `${imageSize.width}`,
+            height: `${imageSize.height}`,
+            transform: `translate(${offset.x}px, ${offset.y}px) scale(${
+              zoomLevel / 100
+            })`,
+          }}
+          draggable={false}
+          className={`absolute origin-top-left select-none max-w-fit ${
+            isDrawingEnabled ? "cursor-crosshair" : ""
+          } ${applyTransition ? "transition-all" : ""}`}
+        />
+      ) : (
+        <div className="text-dark text-[15px] size-full flex flex-col justify-center items-center gap-2">
+          {selectedFile?.imageReconstructionJobStatus === "in progress" && (
+            <>
+              <p className="animate-pulse">
+                Image reconstruction is in progress...
+              </p>
+              <span
+                ref={buttonRef}
+                className="font-bold hover:underline cursor-pointer"
+                onClick={handleReconstructImage}
+              >
+                Reload
+              </span>
+            </>
+          )}
+          {selectedFile?.imageReconstructionJobStatus === "pending" && (
+            <>
+              <p>
+                Image reconstruction has not started. There may be a server
+                issue.
+              </p>
+              <span className="font-bold hover:underline cursor-pointer">
+                Refresh.
+              </span>
+            </>
+          )}
+          {selectedFile?.imageReconstructionJobStatus === "failed" && (
+            <>
+              <p>
+                Image reconstruction failed.{" "}
+                <span
+                  ref={buttonRef}
+                  className="font-bold hover:underline cursor-pointer"
+                  onClick={handleReconstructImage}
+                >
+                  Try again.
+                </span>
+              </p>
+            </>
+          )}
+        </div>
+      )}
+    </>
   );
 });

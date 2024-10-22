@@ -9,7 +9,9 @@ import { useRecoilValue } from "recoil";
 import { currentProjectAtom } from "../../projectAtom";
 
 export default function Page() {
-  const [files, setFiles] = useState<{ file: File; state: string }[]>([]);
+  const [files, setFiles] = useState<
+    { file: File; state: string; imageReconstructionState: string }[]
+  >([]);
   const { name: projectName } = useRecoilValue(currentProjectAtom);
 
   const handleUpload = async () => {
@@ -23,6 +25,7 @@ export default function Page() {
               ? {
                   ...file,
                   state: file.state !== "uploaded" ? "uploading" : file.state,
+                  imageReconstructionState: "",
                 }
               : file
           )
@@ -34,24 +37,31 @@ export default function Page() {
         formData.append("file", fileObj.file);
         formData.append("projectName", projectNameTrimmed);
 
-        const response = await fetch("/api/upload", {
+        await fetch("/api/upload", {
           method: "POST",
           body: formData,
-        });
-
-        if (response.ok) {
-          setFiles((prevFiles) =>
-            prevFiles.map((file, idx) =>
-              idx === index ? { ...file, state: "uploaded" } : file
-            )
-          );
-        } else {
-          setFiles((prevFiles) =>
-            prevFiles.map((file, idx) =>
-              idx === index ? { ...file, state: "failed" } : file
-            )
-          );
-        }
+        })
+          .then((res) => res.json())
+          .then(({ jobStatus }) => {
+            setFiles((prevFiles) =>
+              prevFiles.map((file, idx) =>
+                idx === index
+                  ? {
+                      ...file,
+                      state: "uploaded",
+                      imageReconstructionState: jobStatus,
+                    }
+                  : file
+              )
+            );
+          })
+          .catch(() => {
+            setFiles((prevFiles) =>
+              prevFiles.map((file, idx) =>
+                idx === index ? { ...file, state: "failed" } : file
+              )
+            );
+          });
       } catch (error) {
         setFiles((prevFiles) =>
           prevFiles.map((file, idx) =>
@@ -84,12 +94,13 @@ export default function Page() {
         <div className="flex flex-col gap-[10px] h-full w-full overflow-auto">
           {files.length > 0 && (
             <>
-              {files.map(({ file, state }, index) => {
+              {files.map(({ file, state, imageReconstructionState }, index) => {
                 return (
                   <FileUploadState
                     key={index}
                     fileName={file.name}
                     status={state}
+                    imageReconstructionState={imageReconstructionState}
                     onDelete={() => {
                       files.splice(index, 1);
                       setFiles([...files]);

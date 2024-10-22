@@ -16,22 +16,15 @@ const errorsInit = {
 
 export default function NewProject() {
   const router = useRouter();
-  const [files, setFiles] = useState<{ file: File; state: string }[]>([]);
+  const [files, setFiles] = useState<
+    { file: File; state: string; imageReconstructionState: string }[]
+  >([]);
   const [projectName, setProjectName] = useState("");
   const [projectInputDisabled, setProjectInputDisabled] = useState(false);
   const [errors, setErrors] = useState({ ...errorsInit });
 
   const handleUpload = async () => {
     const projectNameTrimmed = projectName.trim();
-
-    if (!projectNameTrimmed) {
-      setErrors({
-        projectName: "Please enter a project name before uploading files.",
-      });
-      return;
-    }
-
-    setProjectInputDisabled(true);
 
     const uploadPromises = files.map(async (fileObj, index) => {
       try {
@@ -41,6 +34,7 @@ export default function NewProject() {
               ? {
                   ...file,
                   state: file.state !== "uploaded" ? "uploading" : file.state,
+                  imageReconstructionState: "",
                 }
               : file
           )
@@ -52,24 +46,31 @@ export default function NewProject() {
         formData.append("file", fileObj.file);
         formData.append("projectName", projectNameTrimmed);
 
-        const response = await fetch("/api/upload", {
+        await fetch("/api/upload", {
           method: "POST",
           body: formData,
-        });
-
-        if (response.ok) {
-          setFiles((prevFiles) =>
-            prevFiles.map((file, idx) =>
-              idx === index ? { ...file, state: "uploaded" } : file
-            )
-          );
-        } else {
-          setFiles((prevFiles) =>
-            prevFiles.map((file, idx) =>
-              idx === index ? { ...file, state: "failed" } : file
-            )
-          );
-        }
+        })
+          .then((res) => res.json())
+          .then(({ jobStatus }) => {
+            setFiles((prevFiles) =>
+              prevFiles.map((file, idx) =>
+                idx === index
+                  ? {
+                      ...file,
+                      state: "uploaded",
+                      imageReconstructionState: jobStatus,
+                    }
+                  : file
+              )
+            );
+          })
+          .catch(() => {
+            setFiles((prevFiles) =>
+              prevFiles.map((file, idx) =>
+                idx === index ? { ...file, state: "failed" } : file
+              )
+            );
+          });
       } catch (error) {
         setFiles((prevFiles) =>
           prevFiles.map((file, idx) =>
@@ -169,22 +170,24 @@ export default function NewProject() {
                     setFiles([]);
                   }}
                 />
-                {/* <Button></Button> */}
               </div>
               <div className="flex flex-col gap-[10px] h-full overflow-auto">
-                {files.map(({ file, state }, index) => {
-                  return (
-                    <FileUploadState
-                      key={index}
-                      fileName={file.name}
-                      status={state}
-                      onDelete={() => {
-                        files.splice(index, 1);
-                        setFiles([...files]);
-                      }}
-                    />
-                  );
-                })}
+                {files.map(
+                  ({ file, state, imageReconstructionState }, index) => {
+                    return (
+                      <FileUploadState
+                        key={index}
+                        fileName={file.name}
+                        status={state}
+                        imageReconstructionState={imageReconstructionState}
+                        onDelete={() => {
+                          files.splice(index, 1);
+                          setFiles([...files]);
+                        }}
+                      />
+                    );
+                  }
+                )}
               </div>
             </>
           )}

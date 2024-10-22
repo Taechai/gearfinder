@@ -156,7 +156,11 @@ export default function AnnotationEditor({
 
   useEffect(() => {
     if (isOpen) {
-      setTextValue(initialValue);
+      if (initialValue != "") {
+        setTextValue(initialValue);
+      } else {
+        setTextValue(projectClasses.length > 0 ? projectClasses[0] : "");
+      }
       setSuggestions(
         projectClasses.filter((suggestion) =>
           suggestion.toLowerCase().startsWith(initialValue.toLowerCase())

@@ -10,6 +10,7 @@ export const projectFilesAtom = atom<{
     fileName: string,
     fileId: string,
     state: string
+    imageReconstructionJobStatus: string
 }[]>({
     key: "projectFilesAtom",
     default: [],

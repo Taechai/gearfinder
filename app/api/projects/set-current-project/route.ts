@@ -28,7 +28,16 @@ export async function POST(request: NextRequest) {
         select: {
             reconstructedImage: { select: { imagePath: true, annotations: { select: { id: true, className: true } } } },
             fileName: true,
-            id: true
+            id: true,
+            // Select the most recent image reconstruction job
+            imageReconstructionJob: {
+                orderBy: {
+                    createdAt: 'desc',  // Assuming 'createdAt' is the timestamp field
+                },
+                select: {
+                    status: true,
+                },
+            },
         }
     })
 
@@ -53,13 +62,15 @@ export async function POST(request: NextRequest) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7 // 1 week,
     });
+
     return NextResponse.json({
         message: "Project switched succesfully",
-        files: [...files.map(({ reconstructedImage, fileName, id }) => ({
+        files: [...files.map(({ reconstructedImage, fileName, id, imageReconstructionJob }) => ({
             imagePath: reconstructedImage?.imagePath ?? "",
             fileName,
             fileId: id,
-            state: reconstructedImage?.annotations.length == 0 ? "unassigned" : "annotated"
+            state: (reconstructedImage?.annotations.length == 0 || reconstructedImage?.annotations == undefined) ? "unassigned" : "annotated",
+            imageReconstructionJobStatus: imageReconstructionJob[0].status
         }))],
         projectClasses: uniqueProjectClasses
     })

@@ -9,7 +9,11 @@ export default function InputDragFile({
   twWidth,
   twHeight,
 }: {
-  setFiles: Dispatch<SetStateAction<{ file: File; state: string }[]>>;
+  setFiles: Dispatch<
+    SetStateAction<
+      { file: File; state: string; imageReconstructionState: string }[]
+    >
+  >;
   twWidth?: string;
   twHeight?: string;
   accept?: string;
@@ -18,12 +22,20 @@ export default function InputDragFile({
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-    let files: { file: File; state: string }[] = [];
+    let files: {
+      file: File;
+      state: string;
+      imageReconstructionState: string;
+    }[] = [];
     if (fileList) {
       for (let i of _.range(0, fileList.length)) {
-        files.push({ file: fileList[i], state: "local" });
+        files.push({
+          file: fileList[i],
+          state: "local",
+          imageReconstructionState: "",
+        });
       }
-      // console.log(files[0].file.name);
+
       setFiles((prev) => [...prev, ...files]);
       if (inputRef.current) {
         inputRef.current.value = "";

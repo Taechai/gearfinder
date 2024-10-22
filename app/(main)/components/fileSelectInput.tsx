@@ -32,30 +32,30 @@ export default function FileSelectInput({
       />
       <div
         className={`z-[-1] absolute size-full rounded-[10px] transition-all duration-300 ${
-          state == "unassigned"
-            ? "bg-error-dark/5 border-[1px] border-error-dark/40 peer-checked/radio:bg-error-light/40 peer-checked/radio:border-error-dark"
-            : "bg-success-dark/5 border-[1px] border-success-dark/40 peer-checked/radio:bg-success-light/40 peer-checked/radio:border-success-dark"
+          state == "annotated"
+            ? "bg-success-dark/5 border-[1px] border-success-dark/40 peer-checked/radio:bg-success-light/40 peer-checked/radio:border-success-dark"
+            : "bg-error-dark/5 border-[1px] border-error-dark/40 peer-checked/radio:bg-error-light/40 peer-checked/radio:border-error-dark"
         }`}
       />
       <DocumentTextIcon
         className={`size-[15px] transition-all duration-300 ${
-          state == "unassigned"
-            ? "text-error-dark/80 peer-checked/radio:text-error-dark"
-            : "text-success-dark/80 peer-checked/radio:text-success-dark"
+          state == "annotated"
+            ? "text-success-dark/80 peer-checked/radio:text-success-dark"
+            : "text-error-dark/80 peer-checked/radio:text-error-dark"
         }`}
       />
       <p
         className={`w-full pointer-events-auto peer bg-transparent text-sm transition-all duration-300 ${
-          state == "unassigned"
-            ? "text-error-dark/80 peer-checked/radio:text-error-dark"
-            : "text-success-dark/80 peer-checked/radio:text-success-dark"
+          state == "annotated"
+            ? "text-success-dark/80 peer-checked/radio:text-success-dark"
+            : "text-error-dark/80 peer-checked/radio:text-error-dark"
         } font-normal`}
       >
         {label}
       </p>
       <CheckCircleIcon
         className={`size-[15px] opacity-0 scale-90 hover:scale-110 cursor-pointer ease-in-out transition-all duration-300 peer-checked/radio:opacity-100 peer-checked/radio:scale-100 ${
-          state == "unassigned" ? "text-error-dark" : "text-success-dark"
+          state == "annotated" ? "text-success-dark" : "text-error-dark"
         }`}
       />
     </label>

@@ -6,11 +6,13 @@ import {
 } from "@heroicons/react/20/solid";
 export default function FileUploadState({
   status,
+  imageReconstructionState,
   fileName,
   twWidth,
   onDelete,
 }: {
   status: string;
+  imageReconstructionState: string;
   fileName: string;
   twWidth?: string;
   onDelete: () => void;
@@ -61,15 +63,34 @@ export default function FileUploadState({
     <div
       className={`${twWidth} flex flex-row gap-[10px] border-[2px] ${borderColor} justify-center items-center ${bgColor} transition-all rounded-[10px] px-[10px] py-[15px]`}
     >
-      <Icon className={`size-[20px] ${textColor} transition-all ${animate}`} />
+      <Icon
+        className={`size-[20px] min-w-[20px] ${textColor} transition-all ${animate}`}
+      />
       <p
         className={`w-full pointer-events-auto peer bg-transparent text-md ${textColor} font-normal`}
       >
         {fileName}
       </p>
+      {(imageReconstructionState || status != "local") && (
+        <div
+          className={`${
+            status == "uploading"
+              ? "bg-warning-dark"
+              : imageReconstructionState == "completed"
+              ? "bg-success-dark"
+              : "bg-error-dark"
+          } text-sm text-white py-[2px] px-[5px] rounded-[5px] w-fit text-nowrap`}
+        >
+          {status == "uploading"
+            ? "Reconstructing the image"
+            : imageReconstructionState == "completed"
+            ? "Image reconstructed"
+            : "Reconstruction failed"}
+        </div>
+      )}
       <XCircleIcon
         onClick={onDelete}
-        className={`size-[23px] text-error-dark hover:scale-110 cursor-pointer transition-all`}
+        className={`size-[23px] min-w-[23px] text-error-dark hover:scale-110 cursor-pointer transition-all`}
       />
     </div>
   );
