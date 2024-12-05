@@ -37,7 +37,10 @@ export default function Page() {
     <>
       {/* Header of the main part */}
       <div className="bg-light/50 rounded-[10px] flex items-center p-[10px] gap-[10px] justify-between">
-        <h1 className="text-md text-dark font-bold">{fileName}</h1>
+        <h1 className="text-md text-dark">
+          <span className="font-bold">Trip on</span> 11-09-2023 - 18h42 → 19h10
+        </h1>
+        {/* <h1 className="text-md text-dark font-bold">{fileName}</h1> */}
         <div className="flex gap-[10px]">
           <Button
             Icon={BrainIcon}

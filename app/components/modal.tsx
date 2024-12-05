@@ -9,6 +9,7 @@ export default function Modal({
   onClose,
 }: {
   title?: string;
+
   Icon?: React.ComponentType<{
     className?: string;
   }>;

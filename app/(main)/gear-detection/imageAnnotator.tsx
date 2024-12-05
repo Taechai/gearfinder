@@ -10,13 +10,12 @@ import {
   zoomLimitAtom,
   zoomOffsetAtom,
 } from "./annotation-components/atoms/annotationAtoms";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
 import Controls from "./annotation-components/controls";
 
 import AnnotationLayer from "./annotation-components/annotationLayer";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { currentProjectAtom } from "../projectAtom";
+import { useSearchParams } from "next/navigation";
 
 export default function ImageAnnotator() {
   // Variables related to the loaded image
