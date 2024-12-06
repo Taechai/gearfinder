@@ -4,11 +4,10 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { PhotoIcon } from "@heroicons/react/20/solid";
 import React from "react";
 import AugmentationList from "./augmentation-components/augmentationList";
-import {
-  AugmentationParams,
-  augmentationParamsInit,
-} from "./augmentation-components/augmentationConfig";
+import { augmentationParamsInit } from "./augmentation-components/augmentationConfig";
 import AugmentationSelector from "./augmentation-components/augmentationSelector";
+import { useRecoilState } from "recoil";
+import { augmentationParamsAtom } from "./atoms/trainingParamsAtom";
 
 export function AugmentationDetails({
   selectedStep,
@@ -21,9 +20,9 @@ export function AugmentationDetails({
     []
   );
 
-  const [augmentationParams, setAugmentationParams] = useState<{
-    [key: string]: AugmentationParams;
-  }>(JSON.parse(JSON.stringify(augmentationParamsInit)));
+  const [augmentationParams, setAugmentationParams] = useRecoilState(
+    augmentationParamsAtom
+  );
   const [selectedOption, setSelectedOption] = useState("");
   const [isAugmentationOpen, setIsAugmentationOpen] = useState<boolean>(false);
 
@@ -45,7 +44,7 @@ export function AugmentationDetails({
 
   const handleAugmentationToggle = (key: string) => {
     setAugmentationParams((prevParams) => {
-      const updatedParams = { ...prevParams };
+      const updatedParams = JSON.parse(JSON.stringify(prevParams));
       Object.keys(updatedParams).forEach((k) => {
         updatedParams[k].isSelected = k === key;
       });
@@ -75,7 +74,7 @@ export function AugmentationDetails({
 
   const handleSliderChange = (values: number[]) => {
     setAugmentationParams((prevParams) => {
-      let newParams = { ...prevParams };
+      let newParams = JSON.parse(JSON.stringify(prevParams));
       newParams[selectedOption].params[0].value = values[0];
       return newParams;
     });

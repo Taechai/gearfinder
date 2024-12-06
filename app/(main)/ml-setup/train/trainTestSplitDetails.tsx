@@ -1,8 +1,9 @@
 import Button from "@/app/components/button";
 import { DualRangeSliderComponent } from "@/app/components/dualRangeSliderComponent";
-import { Dispatch, SetStateAction, useMemo } from "react";
-import { useRecoilValue } from "recoil";
+import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { projectFilesAtom } from "../../projectAtom";
+import { datasetDistributionAtom } from "./atoms/trainingParamsAtom";
 
 export function TrainTestSplitDetails({
   selectedStep,
@@ -15,18 +16,32 @@ export function TrainTestSplitDetails({
   values: number[];
   setValues: Dispatch<SetStateAction<number[]>>;
 }) {
+  const setDatasetDistribution = useSetRecoilState(datasetDistributionAtom);
+
   const projectFiles = useRecoilValue(projectFilesAtom);
+
   const annotatedCount = useMemo(() => {
     return projectFiles.filter(
       ({ state }) => state.toLowerCase() == "annotated"
     ).length;
   }, [projectFiles]);
+
   const split = useMemo(() => {
     const train = Math.round((annotatedCount * values[0]) / 100);
     const val = Math.round((annotatedCount * (100 - values[1])) / 100);
     const test = annotatedCount - train - val;
     return { train, test, val };
   }, [values, annotatedCount]);
+
+  useEffect(() => {
+    const newDistribution = {
+      train: { percentage: values[0] / 100, num: split.train },
+      test: { percentage: (values[1] - values[0]) / 100, num: split.test },
+      validation: { percentage: (100 - values[1]) / 100, num: split.val },
+    };
+    setDatasetDistribution(newDistribution);
+  }, [split]);
+
   return (
     <div
       className={`flex flex-col ml-[29px] gap-[10px] ${

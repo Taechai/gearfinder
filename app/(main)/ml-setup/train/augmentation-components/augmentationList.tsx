@@ -72,9 +72,9 @@ const AugmentationList: React.FC<AugmentationListProps> = ({
       <Button
         Icon={SquaresPlusIcon}
         onClick={handleSwitchAugmentationModal}
-        otherTwClass={`w-full mb-[7px] bg-secondary-dark !text-white !font-bold col-span-2 ${
+        otherTwClass={`w-full bg-secondary-dark !text-white !font-bold col-span-2 ${
           selectedStep == 3 ? "block" : "hidden"
-        }`}
+        } ${appliedAugmentations.length > 0 && "mb-[7px]"}`}
         twHover={`${
           appliedAugmentations.length > 0
             ? "hover:bg-secondary-main/50 hover:!text-secondary-dark"
