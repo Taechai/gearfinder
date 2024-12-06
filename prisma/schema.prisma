@@ -19,13 +19,14 @@ model User {
 
 // Manages project-related data
 model Project {
-    id          Int      @id @default(autoincrement())
-    projectName String   @unique
-    createdAt   DateTime @default(now())
-    owner       User     @relation("OwnedProjects", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    ownerId     Int
-    sharedWith  User[]   @relation("SharedProjects")
-    files       File[]   @relation("FilesInProject")
+    id                 Int                  @id @default(autoincrement())
+    projectName        String               @unique
+    createdAt          DateTime             @default(now())
+    owner              User                 @relation("OwnedProjects", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ownerId            Int
+    sharedWith         User[]               @relation("SharedProjects")
+    files              File[]               @relation("FilesInProject")
+    machineLearningJob MachineLearningJob[]
 }
 
 // Tracks .xtf files and their metadata
@@ -66,6 +67,16 @@ model ImageReconstructionJob {
     id           Int       @id @default(autoincrement())
     file         File      @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     fileId       Int
+    status       String    @default("pending") // Status of the job: pending, in progress, completed, failed
+    createdAt    DateTime  @default(now())
+    completedAt  DateTime?
+    errorMessage String?
+}
+
+model MachineLearningJob {
+    id           Int       @id @default(autoincrement())
+    project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    projectId    Int
     status       String    @default("pending") // Status of the job: pending, in progress, completed, failed
     createdAt    DateTime  @default(now())
     completedAt  DateTime?

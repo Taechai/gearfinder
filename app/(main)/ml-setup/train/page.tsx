@@ -16,7 +16,7 @@ export default function Page() {
   const [values, setValues] = useState([70, 90]);
 
   return (
-    <div className="col-span-2 row-span-2 flex flex-col gap-[10px] pl-[10px] w-full h-full overflow-auto pt-[3px]">
+    <div className="col-span-2 row-span-2 flex flex-col gap-[10px] pl-[10px] w-full h-full overflow-auto py-[3px]">
       <StepIndicator
         stepNumber={1}
         label="Source"
