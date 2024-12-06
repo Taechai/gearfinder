@@ -133,6 +133,19 @@ export function AugmentationDetails({
     setIsAugmentationOpen(true);
   };
 
+  const handleRemoveClick = (key: string) => {
+    setAugmentationParams((prevParams) => ({
+      ...prevParams,
+      [key]: {
+        ...prevParams[key],
+        params: [
+          ...JSON.parse(JSON.stringify(augmentationParamsInit[key])).params,
+        ],
+      },
+    }));
+    setAppliedAugmentations([...appliedAugmentations.filter((k) => k != key)]);
+  };
+
   return (
     <div className={`ml-[29px] ${selectedStep < 3 && "hidden"}`}>
       <AugmentationList
@@ -141,6 +154,7 @@ export function AugmentationDetails({
         selectedStep={selectedStep}
         handleEditClick={handleEditClick}
         handleSwitchAugmentationModal={handleSwitchAugmentationModal}
+        handleRemoveClick={handleRemoveClick}
       />
       <Button
         otherTwClass={`w-full bg-secondary-light/50 !text-secondary-dark !font-bold ${
