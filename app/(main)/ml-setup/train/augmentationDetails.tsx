@@ -149,7 +149,6 @@ export function AugmentationDetails({
     <div className={`ml-[29px] ${selectedStep < 3 && "hidden"}`}>
       <AugmentationList
         appliedAugmentations={appliedAugmentations}
-        augmentationParams={augmentationParams}
         selectedStep={selectedStep}
         handleEditClick={handleEditClick}
         handleSwitchAugmentationModal={handleSwitchAugmentationModal}
@@ -173,7 +172,6 @@ export function AugmentationDetails({
       >
         <AugmentationSelector
           appliedAugmentations={appliedAugmentations}
-          augmentationParams={augmentationParams}
           selectedOption={selectedOption}
           handleAugmentationToggle={handleAugmentationToggle}
           handleCheckboxChange={handleCheckboxChange}

@@ -8,7 +8,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { annotationsAtom } from "./annotation-components/atoms/annotationAtoms";
 import { projectFilesAtom } from "../projectAtom";
 export default function Page() {
-  const fileName = useSearchParams().get("fileName") || "";
   const annotations = useRecoilValue(annotationsAtom);
   const setProjectFiles = useSetRecoilState(projectFilesAtom);
 

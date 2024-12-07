@@ -5,7 +5,6 @@ import { SquaresPlusIcon } from "@heroicons/react/20/solid";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 interface AugmentationListProps {
   appliedAugmentations: string[];
-  augmentationParams: { [key: string]: any };
   selectedStep: number;
   handleEditClick: (key: string) => void;
   handleSwitchAugmentationModal: () => Promise<void>;
@@ -14,7 +13,6 @@ interface AugmentationListProps {
 
 const AugmentationList: React.FC<AugmentationListProps> = ({
   appliedAugmentations,
-  augmentationParams,
   selectedStep,
   handleEditClick,
   handleSwitchAugmentationModal,
@@ -27,7 +25,7 @@ const AugmentationList: React.FC<AugmentationListProps> = ({
       >
         <ExclamationCircleIcon className="size-[20px] text-error-dark" />
         <p className="font-semibold  text-md text-error-dark">
-          No Augmentation Selected
+          No augmentation has been selected
         </p>
       </div>
     );
@@ -62,10 +60,7 @@ const AugmentationList: React.FC<AugmentationListProps> = ({
               Remove
             </div>
           </div>
-          <AugmentationDescription
-            augmentationParamsKey={key}
-            augmentationParams={augmentationParams}
-          />
+          <AugmentationDescription augmentationParamsKey={key} />
         </React.Fragment>
       ))}
 

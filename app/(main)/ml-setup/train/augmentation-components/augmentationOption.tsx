@@ -1,21 +1,21 @@
 import CheckBox from "@/app/components/checkBox";
 import { SliderComponent } from "@/app/components/sliderComponent";
 import React from "react";
-import { AugmentationParams } from "./augmentationConfig";
+import { useRecoilValue } from "recoil";
+import { augmentationParamsAtom } from "../atoms/trainingParamsAtom";
 
 interface AugmentationOptionProps {
-  augmentationParams: { [key: string]: AugmentationParams };
   selectedOption: string;
   handleCheckboxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSliderChange: (values: number[]) => void;
 }
 
 export default function AugmentationOption({
-  augmentationParams,
   selectedOption,
   handleCheckboxChange,
   handleSliderChange,
 }: AugmentationOptionProps) {
+  const augmentationParams = useRecoilValue(augmentationParamsAtom);
   return (
     <div
       className={`col-span-3 w-full transition-all overflow-hidden h-fit p-[10px]`}

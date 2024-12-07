@@ -2,11 +2,11 @@ import Image from "next/image";
 import React from "react";
 import { useMemo } from "react";
 import AugmentationOption from "./augmentationOption";
-import { AugmentationParams } from "./augmentationConfig";
 import Button from "@/app/components/button";
+import { useRecoilValue } from "recoil";
+import { augmentationParamsAtom } from "../atoms/trainingParamsAtom";
 
 interface AugmentationSelectorProps {
-  augmentationParams: { [key: string]: AugmentationParams };
   appliedAugmentations: string[];
   selectedOption: string;
   handleAugmentationToggle: (key: string) => void;
@@ -16,7 +16,6 @@ interface AugmentationSelectorProps {
 }
 
 export default function AugmentationSelector({
-  augmentationParams,
   appliedAugmentations,
   selectedOption,
   handleAugmentationToggle,
@@ -24,6 +23,7 @@ export default function AugmentationSelector({
   handleSliderChange,
   handleSaveOptions,
 }: AugmentationSelectorProps) {
+  const augmentationParams = useRecoilValue(augmentationParamsAtom);
   const inLineEffects: { [key: string]: string } = useMemo(() => {
     return {
       flip: `scaleX(${
@@ -104,7 +104,6 @@ export default function AugmentationSelector({
             {index == 2 &&
               ["flip", "rotation", "noise"].includes(selectedOption) && (
                 <AugmentationOption
-                  augmentationParams={augmentationParams}
                   handleCheckboxChange={handleCheckboxChange}
                   handleSliderChange={handleSliderChange}
                   selectedOption={selectedOption}
@@ -113,7 +112,6 @@ export default function AugmentationSelector({
             {index == 5 &&
               ["brightness", "contrast", "blur"].includes(selectedOption) && (
                 <AugmentationOption
-                  augmentationParams={augmentationParams}
                   handleCheckboxChange={handleCheckboxChange}
                   handleSliderChange={handleSliderChange}
                   selectedOption={selectedOption}
@@ -121,7 +119,6 @@ export default function AugmentationSelector({
               )}
             {index == 6 && ["hue"].includes(selectedOption) && (
               <AugmentationOption
-                augmentationParams={augmentationParams}
                 handleCheckboxChange={handleCheckboxChange}
                 handleSliderChange={handleSliderChange}
                 selectedOption={selectedOption}

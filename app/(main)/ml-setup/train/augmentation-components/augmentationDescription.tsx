@@ -1,14 +1,12 @@
-import { AugmentationParams } from "./augmentationConfig";
+import { useRecoilValue } from "recoil";
+import { augmentationParamsAtom } from "../atoms/trainingParamsAtom";
 
 export default function AugmentationDescription({
   augmentationParamsKey,
-  augmentationParams,
 }: {
   augmentationParamsKey: string;
-  augmentationParams: {
-    [key: string]: AugmentationParams;
-  };
 }) {
+  const augmentationParams = useRecoilValue(augmentationParamsAtom);
   return (
     <div className="text-secondary-dark/60 text-xs col-span-2 mb-[7px]">
       {augmentationParamsKey === "flip" ? (
