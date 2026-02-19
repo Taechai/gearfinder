@@ -29,7 +29,7 @@ export function CreateInstructions({ selectedStep }: { selectedStep: number }) {
   const handleClick = () => {
     const preparedAugmentationParams =
       prepareAugmentationParamsForPost(augmentationParams);
-
+    console.log(preparedAugmentationParams);
     fetch("/api/jobs/ml", {
       method: "POST",
       headers: {

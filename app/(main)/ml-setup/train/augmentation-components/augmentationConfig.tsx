@@ -53,7 +53,7 @@ export const augmentationParamsInit: { [key: string]: AugmentationParams } = {
       {
         name: "Intensity",
         min: 0,
-        max: 10,
+        max: 20,
         step: 0.1,
         type: "range",
         unit: "%",

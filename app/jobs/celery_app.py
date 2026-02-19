@@ -1,3 +1,5 @@
+# docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
 # import asyncio
 import random
 from celery import Celery 
@@ -149,4 +151,3 @@ def reconstruct_image(file_path:str):
         img = Image.fromarray(np_chan_16bit.astype(np.uint16))
 
         return img
-
