@@ -1,13 +1,16 @@
 # docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 
 # import asyncio
+import os
 import random
-from celery import Celery 
+from celery import Celery
 import time
 
 from pyxtf import xtf_read, concatenate_channel, XTFHeaderType
 import numpy as np
 from PIL import Image # type:ignore
+from pathlib import Path
+from cm2_extract import CM2Reader
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker 
@@ -87,14 +90,21 @@ def process_image_reconstruction(job_id: int):
                 file_record.reconstructedImage = reconstructed_image
 
                 # Set image path
-                img_save_path = f"../../public/reconstructed/{(file_record.filePath.split('/')[-1])[:-4]}.png"
+                filename_without_ext = os.path.splitext(os.path.basename(file_record.filePath))[0]
+                reconstructed_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'public', 'reconstructed')
+                os.makedirs(reconstructed_dir, exist_ok=True)
+                img_save_path = os.path.join(reconstructed_dir, f"{filename_without_ext}.png")
 
-                # Simulate image reconstruction and saving
-                img = reconstruct_image(file_record.filePath)
+                # Reconstruct based on file type
+                file_ext = os.path.splitext(file_record.filePath)[1].lower()
+                if file_ext == '.cm2':
+                    img = reconstruct_cm2_image(file_record.filePath)
+                else:
+                    img = reconstruct_image(file_record.filePath)
                 img.save(img_save_path)
 
                 # Update the reconstructed image path
-                reconstructed_image.imagePath = f"/reconstructed/{(file_record.filePath.split('/')[-1])[:-4]}.png"
+                reconstructed_image.imagePath = f"/reconstructed/{filename_without_ext}.png"
 
                 # Mark the job as completed
                 job.status = "completed"
@@ -119,6 +129,34 @@ def process_image_reconstruction(job_id: int):
                 session.commit()
 
 
+
+
+def reconstruct_cm2_image(file_path: str):
+    reader = CM2Reader(Path(file_path))
+    reader.scan()
+    pings = reader.read_all()
+
+    if not pings:
+        raise ValueError(f"No pings found in CM2 file: {file_path}")
+
+    rows = len(pings)
+    max_half = max(p.half for p in pings)
+
+    port = np.zeros((rows, max_half), dtype=np.uint16)
+    stbd = np.zeros((rows, max_half), dtype=np.uint16)
+
+    for i, p in enumerate(pings):
+        port[i, :p.half] = p.port
+        stbd[i, :p.half] = p.starboard
+
+    def normalize(x):
+        x = x.astype(np.float32)
+        x -= x.min()
+        x /= (x.max() + 1e-6)
+        return (x * 255).astype(np.uint8)
+
+    img_array = np.hstack([normalize(port), normalize(stbd)])
+    return Image.fromarray(img_array, mode="L")
 
 
 def reconstruct_image(file_path:str):
