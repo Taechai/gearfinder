@@ -19,10 +19,11 @@ from sqlalchemy.future import *
 from datetime import datetime
 from models import ImageReconstructionJob, ReconstructedImage  # Assuming your models are here 
 
-app = Celery('celery_app', broker='pyamqp://localhost:5672')
+BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'pyamqp://localhost:5672')
+app = Celery('celery_app', broker=BROKER_URL)
 
 # Configure SQLAlchemy to connect to your database
-DATABASE_URL="postgresql+psycopg2://omarayadi:yourpassword@localhost:5432/gearfinderdb"
+DATABASE_URL = os.environ.get('CELERY_DATABASE_URL', 'postgresql+psycopg2://omarayadi:yourpassword@localhost:5432/gearfinderdb')
 
 # Synchronous SQLAlchemy setup
 engine = create_engine(DATABASE_URL, echo=False)

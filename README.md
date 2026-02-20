@@ -22,40 +22,38 @@ Reconstructed images are saved to `public/reconstructed/` and served statically 
 
 ---
 
-## Requirements
+## Running with Docker Compose (recommended)
 
-- [Node.js](https://nodejs.org/) (v18+)
+This is the easiest way to run the project. Everything starts with a single command.
+
+### Requirements
+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Python](https://www.python.org/) (3.7+) with pip
-- [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or a Python virtual environment (recommended)
 
----
+### First time setup
 
-## First Time Setup
-
-Follow these steps **once** when setting up the project on a new machine.
-
-### Step 1 — Clone the repository
+**1. Clone the repository**
 
 ```bash
 git clone https://github.com/Taechai/gearfinder.git
 cd gearfinder
 ```
 
-### Step 2 — Configure environment variables
-
-Create a `.env` file at the project root:
+**2. Create your `.env` file**
 
 ```bash
-cp .env.example .env   # if .env.example exists, otherwise create it manually
+cp .env.example .env
 ```
 
-Edit `.env` with your own values:
+Edit `.env` and fill in your values:
 
 ```env
-DATABASE_URL="postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/gearfinderdb?schema=public"
+POSTGRES_USER=gearfinder
+POSTGRES_PASSWORD=yourpassword
+
+DATABASE_URL="postgresql://gearfinder:yourpassword@localhost:5432/gearfinderdb?schema=public"
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="generate-a-random-secret-see-below"
+NEXTAUTH_SECRET="paste-a-random-hex-string-here"
 ```
 
 To generate a secure `NEXTAUTH_SECRET`:
@@ -64,119 +62,166 @@ To generate a secure `NEXTAUTH_SECRET`:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### Step 3 — Configure the Python worker credentials
+**3. Start everything**
 
-Open `app/jobs/celery_app.py` and update line 25 with the same credentials you used in `.env`:
-
-```python
-DATABASE_URL="postgresql+psycopg2://YOUR_USER:YOUR_PASSWORD@localhost:5432/gearfinderdb"
+```bash
+docker compose up --build
 ```
 
-### Step 4 — Start RabbitMQ (Docker)
+The `--build` flag is only needed the first time (or after code changes). Docker will:
+- Pull RabbitMQ and PostgreSQL images
+- Build the Next.js and Python containers
+- Push the database schema automatically
+- Start all 5 services
+
+The app is available at http://localhost:3000.
+
+---
+
+### Second and later runs (same machine)
+
+Images are already built, so just run:
+
+```bash
+docker compose up
+```
+
+To stop everything:
+
+```bash
+docker compose down
+```
+
+> Your database data is preserved in a Docker volume between restarts. To wipe everything and start fresh, run `docker compose down -v`.
+
+---
+
+## Running manually (without Docker Compose)
+
+Use this if you prefer to run services individually, e.g. for debugging.
+
+### Requirements
+
+- [Node.js](https://nodejs.org/) (v18+)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for RabbitMQ and PostgreSQL)
+- [Python](https://www.python.org/) (3.7+) with pip
+
+### First time setup
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/Taechai/gearfinder.git
+cd gearfinder
+```
+
+**2. Create your `.env` file**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```env
+POSTGRES_USER=gearfinder
+POSTGRES_PASSWORD=yourpassword
+
+DATABASE_URL="postgresql://gearfinder:yourpassword@localhost:5432/gearfinderdb?schema=public"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="paste-a-random-hex-string-here"
+```
+
+Generate a secret:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+**3. Start RabbitMQ**
 
 ```bash
 docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
-RabbitMQ management UI: http://localhost:15672 (login: `guest` / `guest`)
-
-### Step 5 — Start PostgreSQL (Docker)
-
-Use the same `YOUR_USER` and `YOUR_PASSWORD` you set in `.env`:
+**4. Start PostgreSQL**
 
 ```bash
 docker run -d --name postgres \
-  -e POSTGRES_USER=YOUR_USER \
-  -e POSTGRES_PASSWORD=YOUR_PASSWORD \
+  -e POSTGRES_USER=gearfinder \
+  -e POSTGRES_PASSWORD=yourpassword \
   -e POSTGRES_DB=gearfinderdb \
   -p 5432:5432 \
   postgres:latest
 ```
 
-### Step 6 — Install Node.js dependencies
+**5. Install Node.js dependencies**
 
 ```bash
 npm install
 ```
 
-### Step 7 — Push the database schema
+**6. Push the database schema**
 
 ```bash
 npx prisma db push
 ```
 
-This creates all the tables in your PostgreSQL database.
-
-### Step 8 — Install Python dependencies
+**7. Install Python dependencies**
 
 ```bash
 pip install celery pyxtf numpy Pillow sqlalchemy psycopg2-binary
 ```
 
-### Step 9 — Start all services
+**8. Start all services (3 terminals)**
 
-You need **4 terminals** running simultaneously:
-
-**Terminal 1 — Next.js dev server:**
+Terminal 1 — Next.js:
 ```bash
 npm run dev
 ```
 
-**Terminal 2 — Celery worker:**
+Terminal 2 — Celery worker:
 ```bash
 cd app/jobs
 celery -A celery_app worker --loglevel=info --pool=solo
 ```
 
-**Terminal 3 — Job listener:**
-```bash
-cd app/jobs
-python listen_for_image_reconstruction_jobs.py
-```
-
-The app is now available at http://localhost:3000.
-
----
-
-## Second and Later Runs (Same Machine)
-
-The Docker containers and Node modules already exist — you just need to start everything.
-
-### Step 1 — Start Docker containers
-
-```bash
-docker start rabbitmq
-docker start postgres
-```
-
-Verify they are running:
-
-```bash
-docker ps
-```
-
-Both `rabbitmq` and `postgres` should appear with status `Up`.
-
-### Step 2 — Start the app (3 terminals)
-
-**Terminal 1 — Next.js:**
-```bash
-npm run dev
-```
-
-**Terminal 2 — Celery worker:**
-```bash
-cd app/jobs
-celery -A celery_app worker --loglevel=info --pool=solo
-```
-
-**Terminal 3 — Job listener:**
+Terminal 3 — Job listener:
 ```bash
 cd app/jobs
 python listen_for_image_reconstruction_jobs.py
 ```
 
 The app is available at http://localhost:3000.
+
+---
+
+### Second and later runs (manual, same machine)
+
+**1. Start the Docker containers**
+
+```bash
+docker start rabbitmq postgres
+```
+
+**2. Start the app (3 terminals)**
+
+Terminal 1:
+```bash
+npm run dev
+```
+
+Terminal 2:
+```bash
+cd app/jobs
+celery -A celery_app worker --loglevel=info --pool=solo
+```
+
+Terminal 3:
+```bash
+cd app/jobs
+python listen_for_image_reconstruction_jobs.py
+```
 
 ---
 
@@ -209,7 +254,11 @@ gearfinder/
 │   └── schema.prisma         # Database schema
 ├── public/
 │   └── reconstructed/        # Output folder for reconstructed images
-├── .env                      # Environment variables (not committed)
+├── Dockerfile                # Next.js container
+├── Dockerfile.python         # Python workers container
+├── docker-compose.yml        # Orchestrates all services
+├── .env                      # Your credentials (not committed)
+├── .env.example              # Template to copy from
 └── package.json
 ```
 
@@ -221,17 +270,18 @@ gearfinder/
 - Make sure `NEXTAUTH_SECRET` is set in `.env` and is not empty.
 - Clear your browser cookies for `localhost:3000` and log in again.
 
-**Celery `ValueError: not enough values to unpack`**
-- This is a Windows-specific issue. Always use `--pool=solo`:
+**Celery `ValueError: not enough values to unpack` (manual run on Windows)**
+- Always use `--pool=solo` on Windows:
   ```bash
   celery -A celery_app worker --loglevel=info --pool=solo
   ```
 
-**`[Errno 22] Invalid argument` on image save**
-- Already fixed — the worker uses `os.path.basename()` and `os.path.join()` for Windows-compatible paths.
-
-**`connection refused` on port 5672 or 5432**
+**`connection refused` on port 5672 or 5432 (manual run)**
 - Your Docker containers are not running. Run `docker start rabbitmq postgres`.
 
 **`prisma db push` fails**
-- Make sure the PostgreSQL container is running and the credentials in `.env` match the ones used in `docker run`.
+- Make sure the PostgreSQL container is running and credentials in `.env` match those used in `docker run`.
+
+**Docker Compose build fails**
+- Make sure Docker Desktop is running before executing `docker compose up`.
+- On first run always use `docker compose up --build`.

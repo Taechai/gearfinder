@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+__pycache__
+*.pyc
+*.pyo
+app/api/upload/uploaded-files/*
+public/reconstructed/*
