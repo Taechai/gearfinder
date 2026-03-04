@@ -1,6 +1,7 @@
 import { useCallback, RefObject, useEffect, useRef } from "react";
 import {
   applyTransitionAtom,
+  imageFinetuneAtom,
   imageSizeAtom,
   initialOffsetAtom,
   initialZoomLevelAtom,
@@ -37,6 +38,7 @@ export default React.memo(function ImageDisplay({
   const zoomLevel = useRecoilValue(zoomLevelAtom);
   const applyTransition = useRecoilValue(applyTransitionAtom);
   const isDrawingEnabled = useRecoilValue(isDrawingEnabledAtom);
+  const finetune = useRecoilValue(imageFinetuneAtom);
 
   const setInitialZoomLevel = useSetRecoilState(initialZoomLevelAtom);
   const setInitialOffset = useSetRecoilState(initialOffsetAtom);
@@ -152,6 +154,7 @@ export default React.memo(function ImageDisplay({
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${
               zoomLevel / 100
             })`,
+            filter: `brightness(${finetune.brightness / 100}) contrast(${finetune.contrast / 100}) saturate(${finetune.saturation / 100}) brightness(${finetune.exposure / 100})`,
           }}
           draggable={false}
           className={`absolute origin-top-left select-none max-w-fit ${

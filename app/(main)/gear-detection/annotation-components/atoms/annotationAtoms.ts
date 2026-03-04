@@ -115,3 +115,13 @@ export const isAnnotResizingEnabledAtom = atom({
   key: "isAnnotResizingEnabledAtom",
   default: false,
 });
+
+export const imageFinetuneAtom = atom({
+  key: "imageFinetuneAtom",
+  default: {
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    exposure: 100,
+  },
+});

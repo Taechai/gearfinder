@@ -20,17 +20,29 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d gearfinderdb"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  db-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npx prisma db push
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/gearfinderdb?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   nextjs:
     build:
       context: .
       dockerfile: Dockerfile
+    command: npm run dev
     ports:
       - "3000:3000"
     environment:
@@ -38,8 +50,8 @@ services:
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     volumes:
       - reconstructed:/app/public/reconstructed
       - uploads:/app/app/api/upload/uploaded-files
@@ -55,8 +67,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     volumes:
       - reconstructed:/app/public/reconstructed
       - uploads:/app/app/api/upload/uploaded-files
@@ -72,8 +84,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     volumes:
       - reconstructed:/app/public/reconstructed
       - uploads:/app/app/api/upload/uploaded-files

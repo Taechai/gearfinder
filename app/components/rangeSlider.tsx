@@ -1,11 +1,31 @@
 "use client";
 import { useState } from "react";
 
-export default function RangeSlider() {
-  const [value, setValue] = useState(50);
+interface RangeSliderProps {
+  min?: number;
+  max?: number;
+  defaultValue?: number;
+  value?: number;
+  onChange?: (value: number) => void;
+}
 
-  // Calculate the percentage of the thumb's position to move the background linear-gradient
-  const percentage = ((value - 0) * 100) / (100 - 0);
+export default function RangeSlider({
+  min = 0,
+  max = 100,
+  defaultValue = 50,
+  value: externalValue,
+  onChange,
+}: RangeSliderProps) {
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const value = externalValue !== undefined ? externalValue : internalValue;
+
+  const percentage = ((value - min) * 100) / (max - min);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = Number(e.target.value);
+    setInternalValue(newValue);
+    onChange?.(newValue);
+  };
 
   return (
     <div className="relative w-full h-[8px]">
@@ -24,10 +44,10 @@ export default function RangeSlider() {
       {/* Invisible input range for controlling the slider */}
       <input
         type="range"
-        min="0"
-        max="100"
+        min={min}
+        max={max}
         value={value}
-        onChange={(e: any) => setValue(e.target.value)}
+        onChange={handleChange}
         className="absolute form-range appearance-none w-full h-[8px] bg-transparent cursor-pointer opacity-0"
       />
     </div>
